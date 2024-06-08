@@ -1,4 +1,4 @@
-#titlebox {
+#pagehead {
     background: linear-gradient(115deg, rgb(237, 122, 21), rgb(201, 21, 237));
     color: white;
     margin: 0px;
@@ -12,6 +12,7 @@
     padding-top: 8%;
     padding-bottom: 6%;
     margin: 0px;
+    border-bottom: 3px solid #000000;
 }
 
 .navbar {
@@ -42,16 +43,19 @@
     padding: 20px;
     padding-top: 20px;
     margin-top: 50px;
-    margin-bottom: 30px;
+    margin-bottom: 150px;
     margin-left: 15%;
     margin-right: 15%;
-    border: calc(0.25vw) solid #313131;
+    box-shadow: 10px 10px rgb(0, 0, 0);
     line-height: 1.75;
     font-weight: 600;
+    border-radius: 20px;
+    background-color:   rgb(255, 195, 117);
+    display: block;
 }
 
 .search {
-    background-color: ;
+    background-color: lightgray;
 }
 
 body {
