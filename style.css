@@ -1,0 +1,60 @@
+#titlebox {
+    background: linear-gradient(115deg, rgb(237, 122, 21), rgb(201, 21, 237));
+    color: white;
+    margin: 0px;
+    font-family: 'Raleway';
+    font-weight: 800;
+}
+
+#title {
+    font-size:calc(10px + 3.5vw);
+    text-align: center;
+    padding-top: 8%;
+    padding-bottom: 6%;
+    margin: 0px;
+}
+
+.navbar {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.navitem {
+    float: left; 
+}
+
+.navitem a {
+    color: white;
+    font-size: calc(10px + 0.75vw);
+    text-align: center;
+    padding: 15px calc(10px + 0.75vw);
+    text-decoration: none;
+    float: left; 
+}
+
+.navitem a:hover {
+    background-color: #111;     
+}
+
+#desc {
+    padding: 20px;
+    padding-top: 20px;
+    margin-top: 50px;
+    margin-bottom: 30px;
+    margin-left: 15%;
+    margin-right: 15%;
+    border: calc(0.25vw) solid #313131;
+    line-height: 1.75;
+    font-weight: 600;
+}
+
+.search {
+    background-color: ;
+}
+
+body {
+    font-family: 'Raleway';
+    font-size: calc(10px + 0.75vw)
+}
