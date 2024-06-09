@@ -1,18 +1,16 @@
+body {
+    font-family: 'Raleway';
+    font-size: calc(10px + 0.75vw)
+}
+
 #pagehead {
-    background: linear-gradient(115deg, rgb(237, 122, 21), rgb(201, 21, 237));
+    background: linear-gradient(115deg, rgb(255, 179, 16), rgb(255, 76, 31));
+    /* rgb(237, 122, 21), rgb(201, 21, 237) orange magenta*/
+
     color: white;
     margin: 0px;
     font-family: 'Raleway';
     font-weight: 800;
-}
-
-#title {
-    font-size:calc(10px + 3.5vw);
-    text-align: center;
-    padding-top: 8%;
-    padding-bottom: 6%;
-    margin: 0px;
-    border-bottom: 3px solid #000000;
 }
 
 .navbar {
@@ -39,26 +37,47 @@
     background-color: #111;     
 }
 
+.title {
+    font-size:calc(10px + 3.5vw);
+    text-align: center;
+    padding-top: 8%;
+    padding-bottom: 6%;
+    margin: 0px;
+    /* border-bottom: 3px solid #000000; */
+}
+
+#pagebody {
+    margin-left: 15%;
+    margin-right: 15%;
+}
+
 #desc {
     padding: 20px;
     padding-top: 20px;
+
     margin-top: 50px;
     margin-bottom: 150px;
-    margin-left: 15%;
-    margin-right: 15%;
-    box-shadow: 10px 10px rgb(0, 0, 0);
+
+    background-color:   rgb(253, 190, 108);
+    box-shadow: 10px 10px rgb(173, 104, 13);
+    
     line-height: 1.75;
     font-weight: 600;
     border-radius: 20px;
-    background-color:   rgb(255, 195, 117);
-    display: block;
+    
 }
 
 .search {
     background-color: lightgray;
 }
 
-body {
-    font-family: 'Raleway';
-    font-size: calc(10px + 0.75vw)
+#uni-search-menu {
+    display: none;
+    max-height: 200px; /* Limit the number of visible results */
+    overflow-y: auto; /* Enable vertical scrolling */
+}
+
+  /* Show the menu when search bar is focused */
+#uni-search:focus + .uni-search-menu {
+    display: block;
 }
