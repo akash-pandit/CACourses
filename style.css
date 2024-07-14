@@ -1,16 +1,15 @@
+:root { overscroll-behavior: none; }
+
 body {
     font-family: 'Raleway';
-    font-size: calc(10px + 0.75vw)
+    font-size: calc(10px + 0.75vw);
 }
 
-#pagehead {
-    background: linear-gradient(115deg, rgb(255, 179, 16), rgb(255, 76, 31));
-    /* rgb(237, 122, 21), rgb(201, 21, 237) orange magenta*/
-
-    color: white;
-    margin: 0px;
+#hero {
+    background:rgb(16, 33, 70);
+    color: rgb(235, 235, 235);
     font-family: 'Raleway';
-    font-weight: 800;
+    margin: 0px;
 }
 
 .navbar {
@@ -18,11 +17,11 @@ body {
     margin: 0;
     padding: 0;
     overflow: hidden;
+    width: 45vw;
+    display: inline-block;
 }
 
-.navitem {
-    float: left; 
-}
+.navitem { float: left; }
 
 .navitem a {
     color: white;
@@ -33,42 +32,42 @@ body {
     float: left; 
 }
 
-.navitem a:hover {
-    background-color: #111;     
+.navitem a:hover { background-color: #111; }
+
+#hero-left {
+    background:rgb(16, 33, 70);
+    color: rgb(235, 235, 235);
+    font-weight: 800;
+    width: 35vw;
+    height: 100vh;
+    display: inline-block;
 }
 
-.title {
-    font-size:calc(10px + 3.5vw);
-    text-align: center;
-    padding-top: 8%;
-    padding-bottom: 6%;
-    margin: 0px;
-    /* border-bottom: 3px solid #000000; */
+.headline {
+    font-size:calc(10px + 3vw);
 }
+
+#herogif {
+    background:rgb(52, 104, 216);
+    width: 55vw;
+    height: 100vh;
+    float: right;
+}
+
+
 
 #pagebody {
-    margin-left: 15%;
-    margin-right: 15%;
+    margin: 0% 15%;
 }
 
 #desc {
-    padding: 20px;
-    padding-top: 20px;
-
-    margin-top: 50px;
-    margin-bottom: 150px;
-
-    background-color:   rgb(253, 190, 108);
-    box-shadow: 10px 10px rgb(173, 104, 13);
-    
     line-height: 1.75;
     font-weight: 600;
-    border-radius: 20px;
-    
 }
 
 .search {
     background-color: lightgray;
+    padding-bottom: 10%;
 }
 
 #uni-search-menu {

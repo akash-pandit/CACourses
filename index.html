@@ -12,28 +12,42 @@
     <title>TestArticulation</title>
 </head>
 <body style="margin: 0px;">
+    <header id="hero">
+        <header id="hero-left">
+            <ul class="navbar"> 
+                <!-- Home button in nav bar -->
+                <li class="navitem"><a href="https://ca-courses.vercel.app/">
+                    <i class="fa-solid fa-house"></i> Home</a>
+                </li>
+                <!-- Search Agreements button in nav bar-->
+                <li class="navitem"><a href="#search-agreements">
+                    <i class="fa-solid fa-magnifying-glass"></i> Search</a>
+                </li>
+                <!-- Source Code button in nav bar -->
+                <li class="navitem">
+                    <a href="https://github.com/akash-pandit/CACourses" target="_blank">
+                        <i class="fa-solid fa-code-branch"></i> Source Code
+                    </a>
+                </li>
+            </ul> <!-- end navbar -->
 
-    <header id="pagehead">
-        <ul class="navbar"> 
-            <li class="navitem"><a href="#home"><i class="fa-solid fa-house"></i> Home</a></li>
-            <li class="navitem"><a href="#search-agreements"><i class="fa-solid fa-magnifying-glass"></i> Search</a></li>
-            <!-- <li class="navitem"><a href="#discover-courses"><i class="fa-regular fa-compass"></i> Discover</a></li> -->
-            <!-- in development! -->
-            <li class="navitem"><a href="https://github.com/akash-pandit/CACourses" target="_blank"><i class="fa-solid fa-code-branch"></i> Source Code</a></li>
-        </ul>
+            <h1 class="headline">Find your articulated courses.</h1>
+    
+            <section id="desc">
+                Don't want to take a course at your school? Find any valid replacement course
+                at a california community college with this free tool using data sourced from
+                <a href="https://assist.org/">ASSIST.org</a>.
+            </section>
+    
+            <button>Testing</button>
+        </header> <!-- end hero  -->
+        <header id="hero-right">
+            <div>   </div>
+        </header>
+    </header>
 
-        <p class="title">Find your articulated courses.</p>
-    </header> <!-- end -->
-
-    <div id="pagebody">
-        <section id="desc">
-            Have a lower division class you don't want to take at your home campus? This tool harnesses 
-            <a href="https://assist.org/" target="_blank">ASSIST.org</a>'s extensive database of course 
-            articulations, you can input any lower division course at a public california university 
-            (University of California and California State University) and receive a full list of every 
-            course at any California Community College that can serve as a valid replacement.
-        </section>
-
+    <section id="pagebody">
+        <!-- Select a university -->
         <form id="searchForm" action="/submit" method="get">
             <section class="search">
                 <input type="text" id="uni-search" onfocus="showMenu()" onblur="hideMenu()" placeholder="Search Universities" onkeyup="filterFunction()">
@@ -74,38 +88,40 @@
                 </ul>
             </section> <!-- end class search-->
         </form>
+    </section>
 
-        <script>
-            document.getElementById("uni-search").value = "";
+    <!-- Define JS functions & page load code -->
+    <script>
+        document.getElementById("uni-search").value = "";
 
-            function showMenu(menuID) {
-                document.getElementById("uni-search-menu").style.display = "block";
-            }
+        function showMenu(menuID) {
+            document.getElementById("uni-search-menu").style.display = "block";
+        }
 
-            function hideMenu(menuID) {
-                setTimeout(function() {
-                    document.getElementById("uni-search-menu").style.display = "none";
-                }, 100);
-            }
+        function hideMenu(menuID) {
+            setTimeout(function() {
+                document.getElementById("uni-search-menu").style.display = "none";
+            }, 100);
+        }
 
-            function filterFunction() {
-                let filter = document.getElementById("uni-search").value.toUpperCase();
-                let elements = document.getElementById("uni-search-menu").getElementsByTagName("li");
+        function filterFunction() {
+            let filter = document.getElementById("uni-search").value.toUpperCase();
+            let elements = document.getElementById("uni-search-menu").getElementsByTagName("li");
 
-                for (let i = 0; i < elements.length; i++) {
-                    let a = elements[i].getElementsByTagName("a")[0];
-                    if (a.id.toUpperCase().indexOf(filter) > -1) {
-                        elements[i].style.display = "";
-                    } else {
-                        elements[i].style.display = "none";
-                    }
+            for (let i = 0; i < elements.length; i++) {
+                let a = elements[i].getElementsByTagName("a")[0];
+                if (a.id.toUpperCase().indexOf(filter) > -1) {
+                    elements[i].style.display = "";
+                } else {
+                    elements[i].style.display = "none";
                 }
             }
-
-            function submitForm(value, name) {
-                document.getElementById("uni-search").value = document.getElementById(name).innerHTML;
-                document.getElementById("searchForm").submit(); // Submit the form
-            }
-        </script>
+        }
+        
+        function submitForm(value, name) {
+            document.getElementById("uni-search").value = document.getElementById(name).innerHTML;
+            document.getElementById("searchForm").submit(); // Submit the form
+        }
+    </script>
 </body>
 </html>
