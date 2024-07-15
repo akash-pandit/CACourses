@@ -12,6 +12,8 @@ body {
     margin: 0px;
 }
 
+/* start navbar section */
+
 .navbar {
     list-style-type: none;
     margin: 0;
@@ -34,32 +36,64 @@ body {
 
 .navitem a:hover { background-color: #111; }
 
+/* end navbar section */
+
+/* start hero children section*/
+
 #hero-left {
     background:rgb(16, 33, 70);
     color: rgb(235, 235, 235);
     font-weight: 800;
-    width: 35vw;
-    height: 100vh;
     display: inline-block;
-    float: left;
+}
+
+#goto-search-button {
+    background-color: rgb(52, 104, 216);
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
 }
 
 #hero-right {
     background:rgb(52, 104, 216);
+    float: right;
+}
+
+@media (min-aspect-ratio: 4/3) {
+    #hero-left {
+        width: 45vw;
+        height: 90vh;
+    }
+    #hero-right {
+        width: 55vw;
+        height: 90vh;
+    }
+}
+
+@media (max-aspect-ratio: 4/3) {
+    #hero-left {
+        width: 100vw;
+        height: 30vw;
+    }
+    #hero-right {
+        width: 100vw;
+        height: 50vw;
+    }
 }
 
 .headline {
     font-size:calc(10px + 3vw);
+}   
+
+#hero-gif {
+    padding: 5%;
+    max-width: 90%;
+    max-height: 80%;
 }
 
-#herogif {
-    background:rgb(52, 104, 216);
-    width: 55vw;
-    height: 100vh;
-    float: right;
-}
-
-
+/* end hero children section */
 
 #pagebody {
     margin: 0% 15%;
