@@ -41,6 +41,11 @@ body {
     width: 35vw;
     height: 100vh;
     display: inline-block;
+    float: left;
+}
+
+#hero-right {
+    background:rgb(52, 104, 216);
 }
 
 .headline {
