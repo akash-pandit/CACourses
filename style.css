@@ -63,11 +63,11 @@ body {
 
 @media (min-aspect-ratio: 4/3) {
     #hero-left {
-        width: 45vw;
+        width: 45%;
         height: 90vh;
     }
     #hero-right {
-        width: 55vw;
+        width: 55%;
         height: 90vh;
     }
 }
