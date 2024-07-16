@@ -86,12 +86,15 @@ body {
 
 .headline {
     font-size:calc(10px + 3vw);
-}   
+}       
 
 #hero-gif {
+    display: block;
+    margin: auto;
     padding: 5%;
     max-width: 90%;
     max-height: 80%;
+    border-radius: 10%; /* doesn't work in mobile config */
 }
 
 /* end hero children section */
