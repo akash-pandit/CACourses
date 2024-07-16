@@ -75,7 +75,8 @@ body {
 @media (max-aspect-ratio: 4/3) {
     #hero-left {
         width: 100vw;
-        height: 30vw;
+        height: 100%;
+        overflow: auto;
     }
     #hero-right {
         width: 100vw;
