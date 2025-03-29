@@ -8,7 +8,7 @@ import os
 # and are assumed to be missing. In most cases, this is due to schools not
 # having an updated agreement.
 
-async def fetch_data(client, cc_id, uni_id):
+async def fetch_data(client: httpx.AsyncClient, cc_id: str, uni_id: str):
     """
     Fetch a single articulation agreement from ASSIST and dump the results
     in a new JSON file following the given naming convention:
@@ -19,50 +19,52 @@ async def fetch_data(client, cc_id, uni_id):
     AllPrefixes fails. If neither works, the articulation is deemed as not
     updated and the function returns without writing to a file
     """
+    if os.path.exists(f"./data/{uni_id}/{cc_id}to{uni_id}.json"):
+        return
+    
     try:
-        response = await client.get(f"{uni_id}/AllPrefixes")
+        response = await client.get(f"{cc_id}/to/{uni_id}/AllPrefixes", timeout=30)
         response.raise_for_status()
         result = response.json()
-    except httpx.HTTPStatusError as e:
+    except httpx.HTTPStatusError:
         try:
-            response = await client.get(f"{uni_id}/AllMajors")
+            response = await client.get(f"{cc_id}/to/{uni_id}/AllMajors", timeout=30)
             response.raise_for_status()
             result = response.json()
-        except httpx.HTTPStatusError as e:
-            print(f"Error fetching {cc_id} -> {uni_id}: {e}")
+        except httpx.HTTPStatusError:
+            print(f"Error fetching {cc_id} -> {uni_id}: {response.status_code} at https://assist.org/transfer/results?year=75&institution={cc_id}&agreement={uni_id}&agreementType=to&view=agreement&viewBy=major&viewSendingAgreements=false")
             return
     
     data = json.loads(result.get("result", {}).get("articulations", "[]"))
 
     if data:
-        with open(f"./data/{cc_id}/{cc_id}to{uni_id}.json", "w") as fp:
+        with open(f"./data/{uni_id}/{cc_id}to{uni_id}.json", "w") as fp:
             json.dump(obj=data, fp=fp, indent=2)
     else:
         print(f"No valid data for {cc_id} -> {uni_id}")
 
 
-async def batch_download_queries(cc_id: str, uni_ids: list[str]):
+async def batch_download_queries(cc_ids: list[str], uni_id: str):
     """
     Asynchronously run fetch_data in batch instances for universities
     """
-    os.makedirs(f"./data/{cc_id}", exist_ok=True)
+    os.makedirs(f"./data/{uni_id}", exist_ok=True)
 
-    base_url = f"https://assist.org/api/articulation/Agreements?Key=75/{cc_id}/to/"
+    base_url = f"https://assist.org/api/articulation/Agreements?Key=75/"
     async with httpx.AsyncClient(http2=True, base_url=base_url) as client:
-        tasks = [fetch_data(client, cc_id, uni_id) for uni_id in uni_ids]
+        tasks = [fetch_data(client, cc_id, uni_id) for cc_id in cc_ids]
         await asyncio.gather(*tasks)  # run all requests concurrently
 
 
 def main():
     with open("./data/institutions_cc.json", "r") as cc_fp, open("./data/institutions_state.json", "r") as uni_fp:
-        cc_ids, uni_ids = list(json.load(cc_fp).keys()), list(json.load(uni_fp).keys())
+        cc_ids, uni_ids = list(json.load(cc_fp).keys()), json.load(uni_fp)
     
-    for cc_id in cc_ids:
-        chunks = [uni_ids[i:i+8] for i in range(0, len(uni_ids), 8)]
+    for uni_id, uni_name in uni_ids.items():
+        chunks = [cc_ids[i:i+10] for i in range(0, len(cc_ids), 8)]
         for chunk in chunks:
-            asyncio.run(batch_download_queries(cc_id=cc_id, uni_ids=chunk))
-            print("finished chunk")
-        print("finished all chunks (cc)")
+            asyncio.run(batch_download_queries(cc_ids=chunk, uni_id=uni_id))
+        print(f"Finished all cc_id -> {uni_id} ({uni_name})")
         
 
 if __name__ == "__main__":
