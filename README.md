@@ -6,10 +6,10 @@ Welcome to my little passion project! I've been working on this on and off for a
 
 ## Roadmap
 
-- [ ] Generate a local sqlite version of our production DB with 2 tables: a course glossary and articulation table.
+- [x] Generate a local sqlite version of our production DB with 2 tables: a course glossary and articulation table.
   - [x] Generate course glossary in-memory
-  - [ ] Generate articulation table in-memory
-  - [ ] Write tables to sqlite db
+  - [x] Generate articulation table in-memory
+  - [x] Write tables to sqlite db
 - [ ] Write backend functions to query sqlite db
 - [ ] Add functionality to frontend
   - [ ] Improve/fix dropdown logic & ensure its mobile friendly
@@ -20,7 +20,7 @@ Welcome to my little passion project! I've been working on this on and off for a
 
 ### Current Challenges
 
-- prototype articulation logic parser from data to populate articulation table
+- validating that all agreement course_ids are in the courses table
 - writing tables to db
 
 ## The Vision
