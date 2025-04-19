@@ -10,18 +10,19 @@ Welcome to my little passion project! I've been working on this on and off for a
   - [x] Generate course glossary in-memory
   - [x] Generate articulation table in-memory
   - [x] Write tables to sqlite db
-- [ ] Write backend functions to query sqlite db
+- [x] Write backend functions to query sqlite db
 - [ ] Add functionality to frontend
   - [ ] Improve/fix dropdown logic & ensure its mobile friendly
   - [ ] Parse backend json into basic cells
-- [ ] Port backend functions to AWS lambda & DB to supabase postgres
+- [x] Port backend functions to AWS lambda & DB to supabase postgres
 - [ ] Collaborate with frontend dev for better frontend
 - [ ] Ensure request limits / basic security in place & release
 
 ### Current Challenges
 
-- validating that all agreement course_ids are in the courses table
-- writing tables to db
+- frontend parsing of return json
+- better handling of list items from courses request
+- security security security please dont spam my lambda endpoints
 
 ## The Vision
 
