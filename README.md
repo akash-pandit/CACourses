@@ -11,9 +11,9 @@ Welcome to my little passion project! I've been working on this on and off for a
   - [x] Generate articulation table in-memory
   - [x] Write tables to sqlite db
 - [x] Write backend functions to query sqlite db
-- [ ] Add functionality to frontend
-  - [ ] Improve/fix dropdown logic & ensure its mobile friendly
-  - [ ] Parse backend json into basic cells
+- [x] Add functionality to frontend
+  - [x] Improve/fix dropdown logic & ensure its mobile friendly
+  - [x] Parse backend json into basic cells
 - [x] Port backend functions to AWS lambda & DB to supabase postgres
 - [ ] Collaborate with frontend dev for better frontend
 - [ ] Ensure request limits / basic security in place & release
