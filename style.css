@@ -1,125 +1,48 @@
-:root { overscroll-behavior: none; }
-
 body {
-    font-family: 'Raleway';
-    font-size: calc(10px + 0.75vw);
-}
-
-#hero {
-    background:rgb(16, 33, 70);
-    color: rgb(235, 235, 235);
-    font-family: 'Raleway';
-    margin: 0px;
-}
-
-/* start navbar section */
-
-.navbar {
-    list-style-type: none;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
     margin: 0;
-    padding: 0;
-    overflow: hidden;
-    width: 45vw;
-    display: inline-block;
-}
-
-.navitem { float: left; }
-
-.navitem a {
-    color: white;
-    font-size: calc(10px + 0.75vw);
-    text-align: center;
-    padding: 15px calc(10px + 0.75vw);
-    text-decoration: none;
-    float: left; 
-}
-
-.navitem a:hover { background-color: #111; }
-
-/* end navbar section */
-
-/* start hero children section*/
-
-#hero-left {
-    background:rgb(16, 33, 70);
-    color: rgb(235, 235, 235);
-    font-weight: 800;
-    display: inline-block;
-}
-
-#goto-search-button {
-    background-color: rgb(52, 104, 216);
-    border: none;
-    color: white;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-}
-
-#hero-right {
-    background:rgb(52, 104, 216);
-    float: right;
-}
-
-@media (min-aspect-ratio: 4/3) {
-    #hero-left {
-        width: 45%;
-        height: 90vh;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    color: #333;
+  }
+  
+  h1, h2 {
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  select {
+    width: 100%;
+    max-width: 400px;
+    padding: 0.5rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    font-size: 1rem;
+    box-sizing: border-box;
+  }
+  
+  #articulations-container {
+    margin-top: 1rem;
+  }
+  
+  #articulations-container > div {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  }
+  
+  @media (min-width: 600px) {
+    body {
+      padding: 2rem 3rem;
     }
-    #hero-right {
-        width: 55%;
-        height: 90vh;
+    select {
+      font-size: 1.1rem;
     }
-}
-
-@media (max-aspect-ratio: 4/3) {
-    #hero-left {
-        width: 100vw;
-        height: 100%;
-        overflow: auto;
-    }
-    #hero-right {
-        width: 100vw;
-        height: 100%;
-    }
-}
-
-.headline {
-    font-size:calc(10px + 3vw);
-}       
-
-#hero-gif {
-    display: block;
-    margin: auto;
-    padding: 5%;
-    max-width: 90%;
-    max-height: 80%;
-    border-radius: 10%; /* doesn't work in mobile config */
-}
-
-/* end hero children section */
-
-#pagebody {
-    margin: 0% 15%;
-}
-
-#desc {
-    line-height: 1.75;
-    font-weight: 600;
-}
-
-.search {
-    background-color: lightgray;
-    padding-bottom: 10%;
-}
-
-#uni-search-menu {
-    display: none;
-    max-height: 200px; /* Limit the number of visible results */
-    overflow-y: auto; /* Enable vertical scrolling */
-}
-
-  /* Show the menu when search bar is focused */
-#uni-search:focus + .uni-search-menu {
-    display: block;
-}
+  }
+  
