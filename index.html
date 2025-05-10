@@ -66,7 +66,7 @@
     document.getElementById('uni-select').addEventListener('change', async e => {
       const uniId = e.target.value;
       const courseSelect = document.getElementById('course-select');
-      courseSelect.innerHTML = '<option value="">--Loading Courses--</option>';
+      courseSelect.innerHTML = '<option value="" id="default-courseSelect">--Loading Courses--</option>';
       document.getElementById('articulations-container').innerHTML = '';
       if (!uniId) return;
       try {
@@ -82,7 +82,8 @@
       } catch (err) {
         console.error('Error loading courses:', err);
       }
-      courseSelect.innerHTML = '<option value="">--Select a Course--</option>';
+      const defaultSelect = document.getElementById("default-courseSelect")
+      defaultSelect.innerHTML = '<option value="">--Select a Course--</option>';
     });
 
     // On course change → load articulations + course details
