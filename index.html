@@ -51,7 +51,9 @@
       .then(res => res.json())
       .then(inst => {
         const uniSelect = document.getElementById('uni-select');
-        Object.entries(inst).forEach(([id, name]) => {
+        Object.entries(inst)
+        .sort(([, id], [, name]) => id.localeCompare(name))
+        .forEach(([id, name]) => {
           const opt = document.createElement('option');
           opt.value = id;
           opt.textContent = name;
@@ -64,7 +66,7 @@
     document.getElementById('uni-select').addEventListener('change', async e => {
       const uniId = e.target.value;
       const courseSelect = document.getElementById('course-select');
-      courseSelect.innerHTML = '<option value="">--Select a Course--</option>';
+      courseSelect.innerHTML = '<option value="">--Loading Courses--</option>';
       document.getElementById('articulations-container').innerHTML = '';
       if (!uniId) return;
       try {
@@ -80,6 +82,7 @@
       } catch (err) {
         console.error('Error loading courses:', err);
       }
+      courseSelect.innerHTML = '<option value="">--Select a Course--</option>';
     });
 
     // On course change → load articulations + course details
