@@ -2,6 +2,8 @@ import asyncio
 import httpx
 import json
 import os
+from time import sleep
+import random
 
 # populate data directory with local copy of all ASSIST 2025 articulations
 # any missing articulations are not present in either prefix nor major form
@@ -38,6 +40,8 @@ async def fetch_data(client: httpx.AsyncClient, cc_id: str, uni_id: str):
     data = json.loads(result.get("result", {}).get("articulations", "[]"))
 
     if data:
+        if not os.path.isdir(f"./data/{uni_id}"):
+            os.mkdir(f"./data/{uni_id}")
         with open(f"./data/{uni_id}/{cc_id}to{uni_id}.json", "w") as fp:
             json.dump(obj=data, fp=fp, indent=2)
     else:
@@ -50,7 +54,7 @@ async def batch_download_queries(cc_ids: list[str], uni_id: str):
     """
     os.makedirs(f"./data/{uni_id}", exist_ok=True)
 
-    base_url = f"https://assist.org/api/articulation/Agreements?Key=75/"
+    base_url = "https://assist.org/api/articulation/Agreements?Key=75/"
     async with httpx.AsyncClient(http2=True, base_url=base_url) as client:
         tasks = [fetch_data(client, cc_id, uni_id) for cc_id in cc_ids]
         await asyncio.gather(*tasks)  # run all requests concurrently
@@ -64,7 +68,10 @@ def main():
         chunks = [cc_ids[i:i+10] for i in range(0, len(cc_ids), 8)]
         for chunk in chunks:
             asyncio.run(batch_download_queries(cc_ids=chunk, uni_id=uni_id))
-        print(f"Finished all cc_id -> {uni_id} ({uni_name})")
+        
+        sleepnum = random.random() * 3 + 2
+        print(f"Finished all cc_id -> {uni_id} ({uni_name}), sleeping for {sleepnum:.2f} seconds...")
+        sleep(sleepnum)
         
 
 if __name__ == "__main__":
