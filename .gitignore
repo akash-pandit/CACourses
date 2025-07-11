@@ -1,4 +1,5 @@
 data/*/*
-test-data/*
 pyvenv/*
 .pyvenv/*
+.venv
+.env
