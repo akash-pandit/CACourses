@@ -1,4 +1,5 @@
-import os, json
+import os
+import json
 import requests
 
 SUPA_URL = os.environ['SUPABASE_URL'].rstrip('/')
