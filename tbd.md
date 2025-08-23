@@ -1,0 +1,3 @@
+- figure out what transferring to OR series is at csusm
+  - pending response from csusm registrar
+  - data/23/107to23.json
