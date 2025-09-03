@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python3
 
 import asyncio
 import httpx
@@ -73,6 +73,7 @@ async def fetch_data(
 
 async def main():
     BASE_URL = "https://assist.org/api/articulation/Agreements?Key=75/"
+    skip_agreements_fp = "./data/skipread.csv"
 
     # Read in institution:id mappings
     with open("./data/institutions_cc.json", "r") as cc_fp:
@@ -80,13 +81,14 @@ async def main():
     with open("./data/institutions_state.json", "r") as uni_fp:
         unis = json.load(uni_fp)
 
-    skip_agreements_fp = "skipread.csv"
+    # parse list of agreements to skip
     if not os.path.exists(skip_agreements_fp):
         with open(skip_agreements_fp, 'x') as fp:
             pass
     with open(skip_agreements_fp) as fp:
         skip_agreements = set(fp.read().strip().split("\n"))
-    # 
+
+    # initialize full list of agreements to check before pushing batches
     overflow = [
         (cc, uni, "AllPrefixes") for uni in sorted([int(k) for k in unis.keys()]) 
         for cc in sorted([int(k) for k in ccs.keys()])
@@ -96,13 +98,7 @@ async def main():
         and f"{cc},{uni}" not in skip_agreements
     ]
 
-    skip_agreements_fp = "skipread.csv"
-    if not os.path.exists(skip_agreements_fp):
-        with open(skip_agreements_fp, 'x') as fp:
-            pass
-    with open(skip_agreements_fp) as fp:
-        skip_agreements = fp.read().strip().split("\n")
-
+    # push batches of 50 queries at a time to async client & write responses locally
     async with httpx.AsyncClient(http2=True, base_url=BASE_URL) as client:
 
         for overflow_query_type in ("AllDepartments", "AllMajors", "Error"):

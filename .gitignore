@@ -11,5 +11,5 @@ skipread.csv
 lambda_functions/*.zip
 lambda_functions/lib
 
-# wip alpine port
-*alpine*
+# # wip alpine port
+# *alpine*
