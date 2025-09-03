@@ -24,12 +24,12 @@ def curtime() -> str:
 
 async def fetch_data(
         client: httpx.AsyncClient,
-        cc: str,
-        uni: str,
+        cc: int,
+        uni: int,
         query_type: str,
         overflow: list,
         overflow_query_type: str,
-        err400tracker: list
+        err400tracker: set
     ) -> None:
     url_ext = f"{cc}/to/{uni}/{query_type}"
     # print("[Status] Querying", url_ext)
@@ -38,6 +38,15 @@ async def fetch_data(
         response = await client.get(url_ext, timeout=30)
         if response is None:
             raise RuntimeError("Error: client.get returned None...")
+        
+        json_response = response.json()
+        data = json.loads(json_response.get("result", {}).get("articulations", []))
+        if data:
+            os.makedirs(f"./data/{uni}", exist_ok=True)
+            with open(f"./data/{uni}/{cc}to{uni}-{query_type[3:].lower()}.json", "w") as fp:
+                json.dump(obj=data, fp=fp, indent=2)
+        else:
+            print(f"No valid data for {cc} -> {uni}", file=sys.stderr)
 
         while response.status_code == 429:
             print(f"[Status] {cc=} and {uni=} hit status=429, sleeping 5 minutes...")
@@ -47,10 +56,8 @@ async def fetch_data(
         if response.status_code != 200:
             print(f"Error fetching {cc}>{uni}: {response.status_code} at https://assist.org/transfer/results?year=75&institution={cc}&agreement={uni}&agreementType=to&view=agreement&viewBy=major&viewSendingAgreements=false", file=sys.stderr)
             overflow.append((cc, uni, overflow_query_type))
-
             if response.status_code == 400:
-                err400tracker.append(f"{cc},{uni}")
-
+                err400tracker.add(f"{cc},{uni}")
             return
         
     except httpx.ReadTimeout:
@@ -60,15 +67,6 @@ async def fetch_data(
     except httpx.RequestError as err:
         print(f"[Status] Uncaught error {err=} with {cc=} {uni=} {query_type=}")
         exit(1)
-
-    json_response = response.json()
-    data = json.loads(json_response.get("result", {}).get("articulations", []))
-    if data:
-        os.makedirs(f"./data/{uni}", exist_ok=True)
-        with open(f"./data/{uni}/{cc}to{uni}-{query_type[3:].lower()}.json", "w") as fp:
-            json.dump(obj=data, fp=fp, indent=2)
-    else:
-        print(f"No valid data for {cc} -> {uni}", file=sys.stderr)
 
 
 async def main():
