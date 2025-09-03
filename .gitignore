@@ -1,5 +1,15 @@
-data/*/*
-pyvenv/*
-.pyvenv/*
+# environment
 .venv
 .env
+.gitignore
+
+# other data
+data
+skipread.csv
+
+# lambda deployment artifacts
+lambda_functions/*.zip
+lambda_functions/lib
+
+# wip alpine port
+*alpine*
