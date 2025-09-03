@@ -1,79 +1,132 @@
+#!/usr/bin/python
+
 import asyncio
 import httpx
 import json
 import os
-from time import sleep
-import random
+import time
+import sys
 
-# populate data directory with local copy of all ASSIST 2025 articulations
-# any missing articulations are not present in either prefix nor major form
-# and are assumed to be missing. In most cases, this is due to schools not
-# having an updated agreement.
+"""
+Asynchronously download requests from ASSIST.org's API
+without getting rate limited (50 every 5 minutes)
 
-async def fetch_data(client: httpx.AsyncClient, cc_id: str, uni_id: str):
-    """
-    Fetch a single articulation agreement from ASSIST and dump the results
-    in a new JSON file following the given naming convention:
-    
-    ./data/{cc_id}/{cc_id}to{uni_id}.json
-    
-    AllPrefixes endpoint is tried first, with AllMajors endpoint second if
-    AllPrefixes fails. If neither works, the articulation is deemed as not
-    updated and the function returns without writing to a file
-    """
-    if os.path.exists(f"./data/{uni_id}/{cc_id}to{uni_id}.json"):
-        return
-    
+Data is queried from ASSIST's 2024-2025 academic year
+agreements. Missing articulation files are due to missing
+agreements between the institutions for the academic
+year.
+"""
+
+def curtime() -> str:
+    lt = time.localtime(time.time())
+    return f"{lt.tm_hour:02}:{lt.tm_min:02}:{lt.tm_sec:02}"
+
+
+async def fetch_data(
+        client: httpx.AsyncClient,
+        cc: str,
+        uni: str,
+        query_type: str,
+        overflow: list,
+        overflow_query_type: str,
+        err400tracker: list
+    ) -> None:
+    url_ext = f"{cc}/to/{uni}/{query_type}"
+    # print("[Status] Querying", url_ext)
+    response = None
     try:
-        response = await client.get(f"{cc_id}/to/{uni_id}/AllPrefixes", timeout=30)
-        response.raise_for_status()
-        result = response.json()
-    except httpx.HTTPStatusError:
-        try:
-            response = await client.get(f"{cc_id}/to/{uni_id}/AllMajors", timeout=30)
-            response.raise_for_status()
-            result = response.json()
-        except httpx.HTTPStatusError:
-            print(f"Error fetching {cc_id} -> {uni_id}: {response.status_code} at https://assist.org/transfer/results?year=75&institution={cc_id}&agreement={uni_id}&agreementType=to&view=agreement&viewBy=major&viewSendingAgreements=false")
-            return
-    
-    data = json.loads(result.get("result", {}).get("articulations", "[]"))
+        response = await client.get(url_ext, timeout=30)
+        if response is None:
+            raise RuntimeError("Error: client.get returned None...")
 
+        while response.status_code == 429:
+            print(f"[Status] {cc=} and {uni=} hit status=429, sleeping 5 minutes...")
+            await asyncio.sleep(5*60 + 1)
+            response = await client.get(url_ext, timeout=30)
+
+        if response.status_code != 200:
+            print(f"Error fetching {cc}>{uni}: {response.status_code} at https://assist.org/transfer/results?year=75&institution={cc}&agreement={uni}&agreementType=to&view=agreement&viewBy=major&viewSendingAgreements=false", file=sys.stderr)
+            overflow.append((cc, uni, overflow_query_type))
+
+            if response.status_code == 400:
+                err400tracker.append(f"{cc},{uni}")
+
+            return
+        
+    except httpx.ReadTimeout:
+        overflow.append((cc, uni, query_type))
+        print(f"[Status] Fetching {cc=}, {uni=}, {query_type=} timed out, pushing to overflow") 
+    
+    except httpx.RequestError as err:
+        print(f"[Status] Uncaught error {err=} with {cc=} {uni=} {query_type=}")
+        exit(1)
+
+    json_response = response.json()
+    data = json.loads(json_response.get("result", {}).get("articulations", []))
     if data:
-        if not os.path.isdir(f"./data/{uni_id}"):
-            os.mkdir(f"./data/{uni_id}")
-        with open(f"./data/{uni_id}/{cc_id}to{uni_id}.json", "w") as fp:
+        os.makedirs(f"./data/{uni}", exist_ok=True)
+        with open(f"./data/{uni}/{cc}to{uni}-{query_type[3:].lower()}.json", "w") as fp:
             json.dump(obj=data, fp=fp, indent=2)
     else:
-        print(f"No valid data for {cc_id} -> {uni_id}")
+        print(f"No valid data for {cc} -> {uni}", file=sys.stderr)
 
 
-async def batch_download_queries(cc_ids: list[str], uni_id: str):
-    """
-    Asynchronously run fetch_data in batch instances for universities
-    """
-    os.makedirs(f"./data/{uni_id}", exist_ok=True)
+async def main():
+    BASE_URL = "https://assist.org/api/articulation/Agreements?Key=75/"
 
-    base_url = "https://assist.org/api/articulation/Agreements?Key=75/"
-    async with httpx.AsyncClient(http2=True, base_url=base_url) as client:
-        tasks = [fetch_data(client, cc_id, uni_id) for cc_id in cc_ids]
-        await asyncio.gather(*tasks)  # run all requests concurrently
+    # Read in institution:id mappings
+    with open("./data/institutions_cc.json", "r") as cc_fp:
+        ccs = json.load(cc_fp)
+    with open("./data/institutions_state.json", "r") as uni_fp:
+        unis = json.load(uni_fp)
 
+    skip_agreements_fp = "skipread.csv"
+    if not os.path.exists(skip_agreements_fp):
+        with open(skip_agreements_fp, 'x') as fp:
+            pass
+    with open(skip_agreements_fp) as fp:
+        skip_agreements = set(fp.read().strip().split("\n"))
+    # 
+    overflow = [
+        (cc, uni, "AllPrefixes") for uni in sorted([int(k) for k in unis.keys()]) 
+        for cc in sorted([int(k) for k in ccs.keys()])
+        if not os.path.exists(f"data/{uni}/{cc}to{uni}-prefixes.json")
+        and not os.path.exists(f"data/{uni}/{cc}to{uni}-departments.json")
+        and not os.path.exists(f"data/{uni}/{cc}to{uni}-majors.json")
+        and f"{cc},{uni}" not in skip_agreements
+    ]
 
-def main():
-    with open("./data/institutions_cc.json", "r") as cc_fp, open("./data/institutions_state.json", "r") as uni_fp:
-        cc_ids, uni_ids = list(json.load(cc_fp).keys()), json.load(uni_fp)
+    skip_agreements_fp = "skipread.csv"
+    if not os.path.exists(skip_agreements_fp):
+        with open(skip_agreements_fp, 'x') as fp:
+            pass
+    with open(skip_agreements_fp) as fp:
+        skip_agreements = fp.read().strip().split("\n")
+
+    async with httpx.AsyncClient(http2=True, base_url=BASE_URL) as client:
+
+        for overflow_query_type in ("AllDepartments", "AllMajors", "Error"):
+            query_args = [overflow[i:i+50] for i in range(0, len(overflow), 50)]
+            overflow = []
+
+            if not query_args:
+                continue
     
-    for uni_id, uni_name in uni_ids.items():
-        chunks = [cc_ids[i:i+10] for i in range(0, len(cc_ids), 8)]
-        for chunk in chunks:
-            asyncio.run(batch_download_queries(cc_ids=chunk, uni_id=uni_id))
-        
-        sleepnum = random.random() * 3 + 2
-        print(f"Finished all cc_id -> {uni_id} ({uni_name}), sleeping for {sleepnum:.2f} seconds...")
-        sleep(sleepnum)
-        
+            for i, batch in enumerate(query_args):
+                queries = [
+                    fetch_data(client, cc, uni, query_type, overflow, overflow_query_type, skip_agreements)
+                    for cc, uni, query_type in batch
+                ]
+                await asyncio.gather(*queries)
+
+                with open(skip_agreements_fp, "w") as fp:
+                    fp.write('\n'.join(skip_agreements))
+
+                print(f"[{curtime()}] Completed run {i+1} batch {i+1} of {len(query_args)}, sleeping for 5 minutes...")
+                await asyncio.sleep(5*60 + 1)
+
+                
+
 
 if __name__ == "__main__":
-    main()
-    
+    asyncio.run(main())
