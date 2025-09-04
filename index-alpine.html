@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    <!-- <link rel="stylesheet" href="pico-main/css/pico.amber.min.css"> -->
+     <style>[x-cloak] { display: none !important }</style>
+
+    <title>Course Articulations</title>
+    <!-- <script src="alpine-utils.js"></script> -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
+</head>
+<!------------------------------------------------------------------>
+<body>
+    <h1>CA Courses</h1>
+
+    <div x-data="{
+        loadingUnis: true,
+        unis: [],
+        univ: '',  
+        univID: null,
+        showUniOpts: false,
+
+        loadingCourses: false,
+        courses: ['test'],
+        course: '',
+        courseID: null,
+        showCourseOpts: false,
+
+        loadingArticulations: false,
+        articulations: {},
+
+        toggleUniDropdown() {
+            this.$nextTick(() => {
+                this.showUniOpts = ! this.showUniOpts;
+                this.showCourseOpts = false;
+            })
+        },
+
+        toggleCourseDropdown() {
+            this.$nextTick(() => {
+                this.showCourseOpts = ! this.showCourseOpts;
+                this.showUniOpts = false;
+            })
+        },
+
+        async selectUni(name, id) {
+            this.showUniOpts = false;
+
+            if (id != this.univID) {
+                this.univ = name;
+                this.univID = id;
+                this.course = '';
+                this.courseID = null;
+                await this.fetchCourses();
+            }
+        },
+
+        async fetchCourses() {
+            this.loadingCourses = true;
+            this.courses = await getCoursesArray(this.univID, courseCache);
+            this.loadingCourses = false;
+        },
+
+        selectCourse(courseObj) {
+            console.log(courseObj.name)
+            this.course = courseObj.course_code;
+            this.courseID = courseObj.course_id;
+            this.showCourseOpts = false;
+        },
+
+        get searchUnis() {
+            return this.unis.filter(([name, id]) => {
+                acronym = name
+                        .replace('Polytechnic University', 'Poly')
+                        .replace(/[^A-Z]/g, '')
+                        .toLowerCase();
+                name = name.toLowerCase();
+                univ = this.univ.toLowerCase();
+                short = name
+                        .replaceAll('univversity of california,', 'uc')
+                        .replaceAll('california state university,', 'csu')
+                        .replaceAll('california polytechnic university', 'cal poly')
+
+                return name.includes(univ) || short.includes(univ) || acronym.includes(univ)
+            })
+        },
+
+        get searchCourses() {
+            return this.courses
+        },
+    }" 
+    
+    x-init="$nextTick(() => {
+        fetch('data/institutions_state.json')
+            .then(response => response.json())
+            .then(data => Object.entries(data))
+            .then(arr => arr.map(([k, v]) => [v, k]))
+            .then(entries => entries.sort(([n1, v1], [n2, v2]) => n1.localeCompare(n2)))
+            .then(entries => { 
+                unis = entries; 
+                loadingUnis = false;
+            })
+            .catch(err => { console.error('Error fetching data/insitutions_state.json'); } )
+    })">
+    <!--  -->
+        <div>
+            At
+            <input type="text" placeholder="University"
+            @focus="toggleUniDropdown" @blue="toggleUniDropdown" x-model="univ"></input>
+            , I can replace
+            <input @focus="toggleCourseDropdown" type="text" x-model="course"></input>
+            with...
+        </div>
+
+        <div x-show="showUniOpts" style="overflow-y: auto; max-height: 200px" x-cloak>
+            <div x-show="loadingUnis">Loading universities...</div>
+            <div x-show="!loadingUnis && unis.length === 0">No universities found.</div>
+            <div x-show="!loadingUnis && searchUnis.length > 0">
+                <template x-for="[name, id] in searchUnis" :key="id">
+                    <p @click="selectUni(name, id)" x-text="name"></p>
+                </template>
+            </div>
+        </div>
+
+        <div x-show="showCourseOpts" style="overflow-y: auto; max-height: 200px" x-cloak>
+            <div x-show="loadingCourses">Loading courses...</div>
+            <div x-show="!loadingCourses && courses.length === 0">No courses found.</div>
+            <div x-show="!loadingCourses && searchCourses.length > 0">
+                <template x-for="course in searchCourses" :key="course.course_code">
+                    <p @click="selectCourse(course)" x-text="course.course_code + ': ' + course.course_name"></p>
+                </template>
+            </div>
+        </div>
+
+        <div x-text="'univID: ' + univID"></div>
+        <div x-text="'courseID: ' + courseID"></div>
+    </div>
+
+</body>
+<!------------------------------------------------------------------>
+<script>
+    const API_COURSES = 'https://lzlnwhushmmp5jnpzqed6x4qa40dfsjr.lambda-url.us-west-1.on.aws';
+    const API_ARTS    = 'https://z26wqyts4e52be3njzagavub3e0xxusm.lambda-url.us-west-1.on.aws';
+
+    const courseCache = {};
+    const artiCache = {};
+
+    async function getCoursesArray(univID, cache) {
+        if (univID in cache) { return cache[univID]; }
+
+        try {
+            const result = await fetch(`${API_COURSES}/?uni=${encodeURIComponent(univID)}`)
+            const courses = await result.json()
+            const sortedCourses = courses.sort((a, b) => a.course_code.localeCompare(b.course_code));
+                
+            cache[univID] = sortedCourses;
+            return sortedCourses;
+
+        } catch (error) { console.error("Error fetching data:", error); return {} }
+    }
+</script>
+</body>
+</html>
