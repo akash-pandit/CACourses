@@ -96,6 +96,10 @@ async def main():
         and f"{cc},{uni}" not in skip_agreements
     ]
 
+    if not overflow:
+        print("[Status]: nothing to query, exiting...")
+        exit(0)
+
     # push batches of 50 queries at a time to async client & write responses locally
     async with httpx.AsyncClient(http2=True, base_url=BASE_URL) as client:
 
