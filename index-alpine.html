@@ -26,8 +26,8 @@
 <body class="bg-gray-100 min-h-screen flex flex-col items-center p-4">
     <h1 class="mt-10 text-6xl font-extrabold text-gray-800 text-center mb-6">CA Courses</h1>
 
+    <!-- Main alpine reactive block -->
     <div
-    class="bg-white rounded-xl shadow-2xl p-8 max-w-6xl mx-auto space-y-8"
     x-data="{
         // dropdown globals, can be shared as only 1 dropdown will be opened at a time
         activeIndex: -1,
@@ -41,7 +41,7 @@
         showUniOpts: false,
 
         loadingCourses: false,
-        courses: ['test'],
+        courses: [],
         courseSearching: '',
         course: null,
         courseID: null,
@@ -57,6 +57,7 @@
                 this.univSearching = '';
                 this.univ = name;
                 this.univID = id;
+                this.courseSearching = '';
                 this.course = null;
                 this.courseID = null;
 
@@ -77,7 +78,7 @@
             this.showCourseOpts = false;
 
             if (id != this.courseID) {
-                this.courseSearching = code;
+                this.courseSearching = '';
                 this.course = code;
                 this.courseID = id;
             }
@@ -88,11 +89,11 @@
         async fetchArticulations() {
             this.loadingArticulations = true;
             this.articulations
-        }
+        },
 
         get searchUnis() {
             return this.unis.filter(([name, id]) => {
-                univ = this.univSearching.toLowerCase();
+                searchTerm = this.univSearching.toLowerCase();
                 nameLower = name.toLowerCase()
                 nameShort = nameLower
                             .replaceAll('university of california,', 'uc')
@@ -104,12 +105,19 @@
                             .replace(/[^A-Z]/g, '')
                             .toLowerCase();
 
-                return nameLower.includes(univ) || nameShort.includes(univ) || nameAcro.includes(univ)
+                return nameLower.includes(searchTerm) || nameShort.includes(searchTerm) || nameAcro.includes(searchTerm);
             })
         },
 
-        get searchCourses() {
-            return this.courses
+        get searchCourses() {   
+            return this.courses.filter((course) => {
+                searchTerm = this.courseSearching.toLowerCase();
+
+                nameLower = course.course_name.toLowerCase();
+                codeLower = course.course_code.toLowerCase();
+                
+                return nameLower.includes(searchTerm) || codeLower.includes(searchTerm);
+            })
         },
 
         // Keyboard navigation and blur handling
@@ -171,82 +179,89 @@
     })"
     >
 
-        <!-- Main query block -->
-        <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 text-center text-lg text-gray-700 font-semibold">
-            <span class="inline-block md:inline">At</span>
-            
-            <!-- University Picker -->
-            <div class="relative w-full md:w-auto">
-                <input 
-                    type="text" 
-                    class="w-full md:w-full px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 placeholder:text-gray-600 transition-all duration-200 placeholder:text-center"
-                    @focus="showUniOpts = true"
-                    @blur="handleBlur('univ')"
-                    @keydown="handleKeydown($event, 'uni')"
-                    :placeholder="univ != null ? univ.replace('University of California,', 'UC').replace('California State University,', 'CSU').replace('California Polytechnic University,', 'Cal Poly') : 'University'"
-                    x-model="univSearching"
-                >
-                <!-- Uni picker dropdown -->
-                <div x-show="showUniOpts"
-                    class="absolute z-10 w-full md:w-64 mt-2 bg-white rounded-xl shadow-lg border border-gray-200 overflow-y-auto max-h-64 transition-all duration-200"
-                    x-cloak
-                >
-                    <div x-show="loadingUnis" class="p-4 text-center text-gray-400">Loading universities...</div>
-                    <ul x-show="!loadingUnis && searchUnis.length > 0" class="py-2">
-                        <template x-for="([name, id], index) in searchUnis" :key="id">
-                            <li
-                                @click="selectUni(name, id)"
-                                @mouseenter="activeIndex = index"
-                                :class="{ 'bg-gray-200': activeIndex === index, 'hover:bg-gray-100': activeIndex !== index }"
-                                class="cursor-pointer px-4 py-3 text-sm text-gray-800 transition-colors duration-200"
-                                x-text="name.replace('University of California,', 'UC').replace('California State University,', 'CSU').replace('California Polytechnic University,', 'Cal Poly')"
-                            ></li>
-                        </template>
-                    </ul>
-                    <div x-show="!loadingUnis && searchUnis.length === 0" class="p-4 text-center text-gray-400">
-                        No universities found.
+        <!-- query block -->
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-6xl mx-auto space-y-8 mb-10">
+            <div class="flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4 text-center text-lg text-gray-700 font-semibold">
+                <span class="inline-block md:inline">At</span>
+                
+                <!-- University Picker -->
+                <div class="relative w-full md:w-auto">
+                    <input 
+                        type="text" 
+                        class="w-full md:w-full px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder:text-gray-600 transition-all duration-200 placeholder:text-center"
+                        @focus="showUniOpts = true"
+                        @blur="handleBlur('univ')"
+                        @keydown="handleKeydown($event, 'uni')"
+                        :placeholder="univ != null ? shortenUniName(univ) : 'University'"
+                        x-model="univSearching"
+                    >
+                    <!-- Uni picker dropdown -->
+                    <div x-show="showUniOpts"
+                        class="absolute z-10 w-full md:w-auto mt-2 bg-white rounded-xl shadow-lg border border-gray-200 overflow-y-auto max-h-64 transition-all duration-200"
+                        x-cloak
+                    >
+                        <div x-show="loadingUnis" class="p-4 text-center text-gray-400">Loading universities...</div>
+                        <ul x-show="!loadingUnis && searchUnis.length > 0" class="py-2">
+                            <template x-for="([name, id], index) in searchUnis" :key="id">
+                                <li
+                                    @click="selectUni(name, id)"
+                                    @mouseenter="activeIndex = index"
+                                    :class="{ 'bg-gray-200': activeIndex === index, 'hover:bg-gray-100': activeIndex !== index }"
+                                    class="cursor-pointer px-4 py-3 text-sm text-gray-800 transition-colors duration-200"
+                                    x-text="name"
+                                ></li>
+                            </template>
+                        </ul>
+                        <div x-show="!loadingUnis && searchUnis.length === 0" class="p-4 text-center text-gray-400">
+                            No universities found.
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <span class="inline-block md:inline"> I can replace </span>
-            
-            <!-- Course Picker -->
-            <div class="relative w-full md:w-auto">
-                <input
-                    type="text"
-                    class="w-full md:w-full px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700 transition-all duration-200 placeholder:text-center"
-                    @focus="showCourseOpts = true"
-                    @keydown="handleKeydown($event, 'course')"
-                    @blur="handleBlur('course')"
-                    :placeholder="course !== null ? course : 'Course'"
-                    :class="univID === null ? 'placeholder:text-gray-400' : 'placeholder:text-gray-600'"
-                    x-model="course"
-                    x-bind:disabled="univID === null"
-                >
-                <!-- Class picker dropdown -->
-                <div x-show="showCourseOpts"
-                    class="absolute z-10 w-full md:w-96 mt-2 bg-white rounded-xl shadow-lg border border-gray-200 overflow-y-auto max-h-64 transition-all duration-200"
-                    x-cloak
-                >
-                    <div x-show="loadingCourses" class="p-4 text-center text-gray-400">Loading courses...</div>
-                    <ul x-show="!loadingCourses && searchCourses.length > 0" class="py-2">
-                        <template x-for="(c, index) in searchCourses" :key="c.course_code">
-                            <li
-                                @click="selectCourse(c.course_code, c.course_id)"
-                                @mouseenter="activeIndex = index"
-                                :class="{ 'bg-gray-200': activeIndex === index, 'hover:bg-gray-100': activeIndex !== index }"
-                                class="cursor-pointer px-4 py-3 text-sm text-gray-800 transition-colors duration-200"
-                                x-text="c.course_code + ': ' + c.course_name"
-                            ></li>
-                        </template>
-                    </ul>
-                    <div x-show="!loadingCourses && searchCourses.length === 0" class="p-4 text-center text-gray-400">
-                        No courses found.
+                <span class="inline-block md:inline"> I can replace </span>
+                
+                <!-- Course Picker -->
+                <div class="relative w-full md:w-auto">
+                    <input
+                        type="text"
+                        class="w-full md:w-40 px-4 py-2 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all duration-200 placeholder:text-center"
+                        @focus="showCourseOpts = true"
+                        @keydown="handleKeydown($event, 'course')"
+                        @blur="handleBlur('course')"
+                        :placeholder="course !== null ? course : 'Course'"
+                        :disabled="univID === null"
+                        :class="univID === null ? 'placeholder:text-gray-400' : 'placeholder:text-gray-600'"
+                        x-model="courseSearching"
+                    >
+                    <!-- Class picker dropdown -->
+                    <div x-show="showCourseOpts"
+                        class="absolute left-1/2 -translate-x-1/2 z-10 w-full md:w-96 mt-2 bg-white rounded-xl shadow-lg border border-gray-200 overflow-y-scroll max-h-64 transition-all duration-200 justify-center"
+                        x-cloak
+                    >
+                        <div x-show="loadingCourses" class="p-4 text-center text-gray-400">Loading courses...</div>
+                        <ul x-show="!loadingCourses && searchCourses.length > 0" class="py-2">
+                            <template x-for="(c, index) in searchCourses" :key="c.course_code">
+                                <li
+                                    @click="selectCourse(c.course_code, c.course_id)"
+                                    @mouseenter="activeIndex = index"
+                                    :class="{ 'bg-gray-200': activeIndex === index, 'hover:bg-gray-100': activeIndex !== index }"
+                                    class="cursor-pointer px-4 py-3 text-sm text-gray-800 transition-colors duration-200"
+                                    x-text="c.course_code + ': ' + c.course_name"
+                                ></li>
+                            </template>
+                        </ul>
+                        <div x-show="!loadingCourses && searchCourses.length === 0" class="p-4 text-center text-gray-400">
+                            No courses found.
+                        </div>
                     </div>
                 </div>
+                <span class="inline-block md:inline">with...</span>
             </div>
-            <span class="inline-block md:inline">with...</span>
+        </div>
+        
+        <!-- articulation block -->
+        <div class="bg-white rounded-xl p-8 max-w-5xl w-4/5 mx-auto space-y-8 mb-10">
+
         </div>
 
         <div class="text-center text-sm text-gray-500 mt-4 space-y-2">
@@ -255,17 +270,23 @@
         </div>
     </div>
 
+
+    </div>
+
 </body>
 <!------------------------------------------------------------------>
 <script>
     const courseCache = {};
     const artiCache = {};
 
+    // document.addEventListener('queriedArticulations')
+
     async function getCoursesArray(univID, cache) {
         if (univID in cache) { return cache[univID]; }
 
         try {
-            const API_COURSES = 'https://lzlnwhushmmp5jnpzqed6x4qa40dfsjr.lambda-url.us-west-1.on.aws';
+            const API_COURSES = 'https://lzlnwhushmmp5jnpzqed6x4qa40dfsjr.lambda-url.us-west-1.on.aws'; 
+            console.log(`sending request to ${API_COURSES}/?uni=${encodeURIComponent(univID)}`) 
             const result = await fetch(`${API_COURSES}/?uni=${encodeURIComponent(univID)}`)
             const courses = await result.json()
             const sortedCourses = courses.sort((a, b) => a.course_code.localeCompare(b.course_code));
@@ -288,6 +309,16 @@
             return [agreements, courses]
 
         } catch (error) { console.error("Error fetching articulations:", error); return []; }
+    }
+
+    function shortenUniName(name) {
+        return name
+            .replace("University of California,", "UC")
+            .replace("California State University,", "Cal State")
+            .replace("California Polytechnic University,", "Cal Poly")
+            .replace("State University", "State")
+            .replace("San Luis Obispo", "SLO")
+
     }
 </script>
 </body>
