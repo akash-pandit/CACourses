@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 import polars as pl
-from functools import lru_cache
-
 from pathlib import Path
 
 from .utils.dnf_converter import to_dnf
@@ -101,7 +99,9 @@ def extract_articulations(fp: Path, schema: pl.Schema | None) -> pl.DataFrame:
     )
 
 
-
-
+if __name__ == "__main__":
+    # global constants
+    DATA_DIR = Path("/home/akash/Main/projects/CACourses/data")
+    SCHEMA_DIR = DATA_DIR/"../etl-pipeline/"
 
 
