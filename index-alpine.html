@@ -12,6 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+    <script src="alpine-component.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
 
@@ -27,157 +28,7 @@
     <h1 class="mt-10 text-6xl font-extrabold text-gray-800 text-center mb-6">CA Courses</h1>
 
     <!-- Main alpine reactive block -->
-    <div
-    x-data="{
-        // dropdown globals, can be shared as only 1 dropdown will be opened at a time
-        activeIndex: -1,
-        blurTimeout: null,
-
-        loadingUnis: true,
-        unis: [],
-        univSearching: '',
-        univ: null,
-        univID: null,
-        showUniOpts: false,
-
-        loadingCourses: false,
-        courses: [],
-        courseSearching: '',
-        course: null,
-        courseID: null,
-        showCourseOpts: false,
-
-        loadingArticulations: false,
-        artiAgreements: {},
-
-        async selectUni(name, id) {
-            this.showUniOpts = false;
-
-            if (id != this.univID) {
-                this.univSearching = '';
-                this.univ = name;
-                this.univID = id;
-                this.courseSearching = '';
-                this.course = null;
-                this.courseID = null;
-
-                console.log('fetching courses');
-                await this.fetchCourses();
-            }
-
-            if (this.blurTimeout) { clearTimeout(this.blurTimeout); }
-        },
-
-        async fetchCourses() {
-            this.loadingCourses = true;
-            this.courses = await getCoursesArray(this.univID, courseCache);
-            this.loadingCourses = false;
-        },
-
-        selectCourse(code, id) {
-            this.showCourseOpts = false;
-
-            if (id != this.courseID) {
-                this.courseSearching = '';
-                this.course = code;
-                this.courseID = id;
-            }
-
-            console.log(code, id);
-        },
-        
-        async fetchArticulations() {
-            this.loadingArticulations = true;
-            this.articulations
-        },
-
-        get searchUnis() {
-            return this.unis.filter(([name, id]) => {
-                searchTerm = this.univSearching.toLowerCase();
-                nameLower = name.toLowerCase()
-                nameShort = nameLower
-                            .replaceAll('university of california,', 'uc')
-                            .replaceAll('california state university,', 'csu')
-                            .replaceAll('california polytechnic university', 'cal poly calpoly')
-                            .replaceAll('san luis obispo', 'slo')
-                nameAcro = name
-                            .replace('Polytechnic University', 'Poly')
-                            .replace(/[^A-Z]/g, '')
-                            .toLowerCase();
-
-                return nameLower.includes(searchTerm) || nameShort.includes(searchTerm) || nameAcro.includes(searchTerm);
-            })
-        },
-
-        get searchCourses() {   
-            return this.courses.filter((course) => {
-                searchTerm = this.courseSearching.toLowerCase();
-
-                nameLower = course.course_name.toLowerCase();
-                codeLower = course.course_code.toLowerCase();
-                
-                return nameLower.includes(searchTerm) || codeLower.includes(searchTerm);
-            })
-        },
-
-        // Keyboard navigation and blur handling
-        handleKeydown(event, type) {
-            const results = type === 'uni' ? this.searchUnis : this.searchCourses;
-            switch (event.key) {
-                case 'ArrowDown':
-                    event.preventDefault();
-                    this.activeIndex = (this.activeIndex + 1) % results.length;
-                    break;
-                case 'ArrowUp':
-                    event.preventDefault();
-                    this.activeIndex = (this.activeIndex - 1 + results.length) % results.length;
-                    break;
-                case 'Enter':
-                    if (this.activeIndex > -1) {
-                        event.preventDefault();
-                        if (type === 'uni') {
-                            const [name, id] = results[this.activeIndex];
-                            this.selectUni(name, id);
-                        } else {
-                            const c = results[this.activeIndex]
-                            this.selectCourse(c.course_code, c.course_id);
-                        }
-                    }
-                    break;
-                case 'Escape':
-                    if (type === 'uni') this.showUniOpts = false;
-                    else this.showCourseOpts = false;
-                    this.activeIndex = -1;
-                    break;
-            }
-        },
-
-        handleBlur(elemName) {
-            this.blurTimeout = setTimeout(() => {
-                if (elemName == 'univ') {
-                    console.log('elemName == univ')
-                    this.showUniOpts = false;
-                } else if (elemName == 'course' && this.univID !== null) {
-                    console.log('elemName == course && this.univID !== null')
-                    this.showCourseOpts = false;
-                }
-                this.activeIndex = -1;
-            }, 200)
-        },
-    }"
-    x-init="$nextTick(() => {
-        fetch('data/institutions_state.json')
-            .then(response => response.json())
-            .then(data => Object.entries(data))
-            .then(arr => arr.map(([k, v]) => [v, k]))
-            .then(entries => entries.sort(([n1, v1], [n2, v2]) => n1.localeCompare(n2)))
-            .then(entries => { 
-                unis = entries; 
-                loadingUnis = false;
-            })
-            .catch(err => { console.error('Error fetching data/insitutions_state.json'); } )
-    })"
-    >
+    <div x-data="alpineMain">
 
         <!-- query block -->
         <div class="bg-white rounded-xl shadow-2xl p-8 max-w-6xl mx-auto space-y-8 mb-10">
@@ -261,7 +112,7 @@
         
         <!-- articulation block -->
         <div class="bg-white rounded-xl p-8 max-w-5xl w-4/5 mx-auto space-y-8 mb-10">
-
+            
         </div>
 
         <div class="text-center text-sm text-gray-500 mt-4 space-y-2">
@@ -276,19 +127,16 @@
 </body>
 <!------------------------------------------------------------------>
 <script>
-    const courseCache = {};
-    const artiCache = {};
-
-    // document.addEventListener('queriedArticulations')
 
     async function getCoursesArray(univID, cache) {
+        // console.log(`getCoursesArray(${courseID}, courseCache)`)
         if (univID in cache) { return cache[univID]; }
 
         try {
             const API_COURSES = 'https://lzlnwhushmmp5jnpzqed6x4qa40dfsjr.lambda-url.us-west-1.on.aws'; 
-            console.log(`sending request to ${API_COURSES}/?uni=${encodeURIComponent(univID)}`) 
-            const result = await fetch(`${API_COURSES}/?uni=${encodeURIComponent(univID)}`)
-            const courses = await result.json()
+            // console.log(`sending request to ${API_COURSES}/?uni=${encodeURIComponent(univID)}`);
+            const result = await fetch(`${API_COURSES}/?uni=${encodeURIComponent(univID)}`);
+            const courses = await result.json();
             const sortedCourses = courses.sort((a, b) => a.course_code.localeCompare(b.course_code));
                 
             cache[univID] = sortedCourses;
@@ -298,27 +146,19 @@
     }
 
     async function getArticulationsArray(courseID, cache) {
+        // console.log(`getArticulationsArray(${courseID}, artiCache)`)
         if (courseID in cache) { return cache[courseID]; }
 
         try {
             const API_ARTS    = 'https://z26wqyts4e52be3njzagavub3e0xxusm.lambda-url.us-west-1.on.aws';
-            const result = await fetch(`${API_ARTS}/?course_id=${encodeURIComponent(courseID)}`)
-            const [agreements, courses] = await result.json()
+            // console.log(`sending request to ${API_ARTS}/?course_id=${encodeURIComponent(courseID)}`);
+            const result = await fetch(`${API_ARTS}/?course_id=${encodeURIComponent(courseID)}`);
+            const [agreements, courses] = await result.json();
             
-            cache[courseID] = [agreements, courses]
-            return [agreements, courses]
+            cache[courseID] = [agreements, courses];
+            return [agreements, courses];
 
         } catch (error) { console.error("Error fetching articulations:", error); return []; }
-    }
-
-    function shortenUniName(name) {
-        return name
-            .replace("University of California,", "UC")
-            .replace("California State University,", "Cal State")
-            .replace("California Polytechnic University,", "Cal Poly")
-            .replace("State University", "State")
-            .replace("San Luis Obispo", "SLO")
-
     }
 </script>
 </body>
