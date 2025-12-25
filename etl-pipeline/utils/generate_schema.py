@@ -32,8 +32,10 @@ def _merge_dtypes_optimized(dtype1: pl.DataType, dtype2: pl.DataType) -> pl.Data
         return dtype1
 
     # 2. Null Handling
-    if isinstance(dtype1, pl.Null): return dtype2
-    if isinstance(dtype2, pl.Null): return dtype1
+    if isinstance(dtype1, pl.Null):
+        return dtype2
+    if isinstance(dtype2, pl.Null):
+        return dtype1
 
     # 3. Recursive List Merge
     if isinstance(dtype1, pl.List) and isinstance(dtype2, pl.List):
