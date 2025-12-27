@@ -16,6 +16,7 @@ represented as a 2d array
 """
 
 from typing import Literal, TypedDict, Union
+import itertools
 
 
 class ArticulationExpr(TypedDict):
@@ -23,21 +24,18 @@ class ArticulationExpr(TypedDict):
     items: list[Union["ArticulationExpr", int]]
 
 
-def to_dnf(expr: ArticulationExpr | int):
+def _to_dnf(node):
     """
     Recursively flattens a logic tree of arbitrary depth into a 2D matrix.
     Returns: List[List[int]] (Disjunctive Normal Form)
     """
-    from itertools import product
-
-
     # base: no conjunctions
-    if not isinstance(expr, dict):
-        return [[expr]] if expr is not None else []
+    if not isinstance(node, dict):
+        return [[node]] if node is not None else []
 
     # extract logic & children
-    conj = expr.get("conj")
-    children = expr.get("items")
+    conj = node.get("conj")
+    children = node.get("items")
     if not children:
         return []
 
@@ -49,7 +47,7 @@ def to_dnf(expr: ArticulationExpr | int):
             return [[x] for x in children]  # Or(1, 2) -> [[1], [2]]
 
     # recurse children to child matrices
-    child_matrices = [to_dnf(child) for child in children]
+    child_matrices = [_to_dnf(child) for child in children]
 
     # DNF algorithm: apply associative property on Or(1, 2, Or(3))
     if conj == "Or":
@@ -63,7 +61,7 @@ def to_dnf(expr: ArticulationExpr | int):
     # => (A AND (C OR D)) OR (B AND (C OR D))
     # => (A AND C) OR (A AND D) OR (B AND C) OR (B AND D)
     elif conj == "And":
-        product = product(*child_matrices)
+        product = itertools.product(*child_matrices)
         
         merged_matrix = []
         for combination in product:
@@ -75,3 +73,16 @@ def to_dnf(expr: ArticulationExpr | int):
         return merged_matrix
     
     return []
+
+
+def to_dnf(expr: dict | int):
+    """
+    Recursively flattens a logic tree of arbitrary depth into a 2D matrix.
+    Returns: List[List[int]] (Disjunctive Normal Form)
+    """
+    
+    mat = _to_dnf(expr)
+    return {
+        "conj": "Or",
+        "items": [{"conj": "And", "items": row} for row in mat]
+    }
