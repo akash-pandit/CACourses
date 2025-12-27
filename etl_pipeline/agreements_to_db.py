@@ -112,7 +112,7 @@ def write_to_db(agreements: pl.DataFrame, db_url: str) -> None:
     
     engine = create_engine(db_url)
 
-    with engine.connect() as conn:
+    with engine.begin() as conn:
         conn.execute(text("DROP TABLE IF EXISTS articulations;"))
         conn.execute(text("""
             CREATE TABLE articulations(
@@ -134,6 +134,9 @@ def write_to_db(agreements: pl.DataFrame, db_url: str) -> None:
 
 
 def main() -> None:
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger("agreements_to_db")
+
     # file paths
     PROJECTDIR = Path("/home/akash/Main/projects/CACourses")
     DATA_DIR = PROJECTDIR/"data"
@@ -147,14 +150,15 @@ def main() -> None:
     psql_pwd =    os.getenv("LOCALDB_PWD")
     psql_dbname = os.getenv("LOCALDB_NAME")
     db_url = f"postgresql+psycopg2://{psql_user}:{psql_pwd}@localhost:5432/{psql_dbname}"
+    # logger.debug(f"db url: {db_url}")
 
     # load schema for prefix-based data
     if schema_prefix_fp.exists():
-        logging.info("Loading precomputed schema for prefix-based articulations")
+        logger.info("Loading precomputed schema for prefix-based articulations")
         with schema_prefix_fp.open(mode='rb') as fp:
             schema_prefix: pl.Schema = pickle.load(file=fp)
     else:
-        logging.info("Precomputed prefix schema not found, inferring from data")
+        logger.info("Precomputed prefix schema not found, inferring from data")
         schema_list_prefix = [pl.read_json(fp, infer_schema_length=None).schema for fp in DATA_DIR.glob("*/*prefixes.json")]
         schema_prefix = merge_schemas(schemas=schema_list_prefix)
         with schema_prefix_fp.open(mode='wb') as fp:
@@ -162,11 +166,11 @@ def main() -> None:
 
     # load schema for major-based data
     if schema_major_fp.exists():
-        logging.info("Loading precomputed schema for major-based articulations")
+        logger.info("Loading precomputed schema for major-based articulations")
         with schema_major_fp.open(mode='rb') as fp:
             schema_major: pl.Schema = pickle.load(file=fp)
     else:
-        logging.info("Precomputed major schema not found, inferring from data")
+        logger.info("Precomputed major schema not found, inferring from data")
         schema_list_major  = [pl.read_json(fp, infer_schema_length=None).schema for fp in DATA_DIR.glob("*/*majors.json")]
         schema_major  = merge_schemas(schema_list_major)
         with schema_major_fp.open(mode="wb") as fp:
@@ -174,12 +178,12 @@ def main() -> None:
 
 
     # extract articulations
-    logging.info("Extracting articulations")
+    logger.info("Extracting articulations")
     prefixes_agg = [
         extract_articulations(fp=fp, schema=schema_prefix)
         .with_columns(
             pl.col("articulation")
-            .map_elements(to_dnf, return_dtype=pl.List(pl.List(pl.Int64)))
+            .map_elements(to_dnf, return_dtype=pl.Struct)
         )
         for fp in DATA_DIR.glob("*/*prefixes.json")
     ]
@@ -187,18 +191,22 @@ def main() -> None:
         extract_articulations(fp=fp, schema=schema_major)
         .with_columns(
             pl.col("articulation")
-            .map_elements(to_dnf, return_dtype=pl.List(pl.List(pl.Int64)))
+            .map_elements(to_dnf, return_dtype=pl.Struct)
         )
         for fp in DATA_DIR.glob("*/*majors.json")
     ]
-    articulations = pl.concat(prefixes_agg + majors_agg)
+    articulations = pl.concat(prefixes_agg + majors_agg).with_columns(
+        pl.col("articulation")
+        .struct.json_encode()
+    )
 
     # write articulations to database
-    logging.info("Writing articulations to ")
+    logger.info("Writing articulations to database")
     write_to_db(
         agreements=articulations,
         db_url=db_url
     )
+    logger.info("Transaction complete")
     return
 
     
