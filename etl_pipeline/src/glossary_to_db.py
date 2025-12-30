@@ -7,7 +7,7 @@ from pathlib import Path
 import polars as pl
 # from sqlalchemy import 
 
-from utils.generate_schema import load_full_schema
+from ..utils.generate_schema import load_full_schema
 
 
 def create_glossary_lazy(fp: Path, schema: pl.Schema) -> pl.LazyFrame:
