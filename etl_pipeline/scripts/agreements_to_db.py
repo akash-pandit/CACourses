@@ -7,7 +7,7 @@ import polars as pl
 from pathlib import Path
 from sqlalchemy import text, create_engine, JSON
 
-from ..utils import (
+from utils import (
     extract_articulations_lazy,
     load_full_schema,
     to_dnf,
@@ -60,10 +60,12 @@ def main() -> None:
     schema_major_fp = ETL_DIR / "schemas/schema_major.pickle"
     
     load_dotenv(dotenv_path=ETL_DIR/".env")
-    psql_user =   os.getenv("LOCALDB_USER")
-    psql_pwd =    os.getenv("LOCALDB_PWD")
-    psql_dbname = os.getenv("LOCALDB_NAME")
-    db_url = f"postgresql+psycopg://{psql_user}:{psql_pwd}@localhost:5432/{psql_dbname}"
+    psql_user =   os.getenv("POSTGRES_USER")
+    psql_pwd =    os.getenv("POSTGRES_PWD")
+    psql_host =   os.getenv("POSTGRES_HOSTNAME")
+    psql_port =   os.getenv("POSTGRES_PORT")
+    psql_dbname = os.getenv("POSTGRES_DBNAME")
+    psql_url = f"postgresql+psycopg://{psql_user}:{psql_pwd}@{psql_host}:{psql_port}/{psql_dbname}"
 
     # 2. get polars schemas
 
@@ -116,7 +118,7 @@ def main() -> None:
     with timer(label="Write to PgSQL", logger=logger, level=logging.INFO):
         write_to_db(
             agreements=articulations,
-            db_url=db_url
+            db_url=psql_url
         )
     return
 
