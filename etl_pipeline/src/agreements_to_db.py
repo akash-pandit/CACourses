@@ -7,9 +7,9 @@ import polars as pl
 from pathlib import Path
 from sqlalchemy import text, create_engine, JSON
 
-from ..utils.dnf_converter import to_dnf
-from ..utils.generate_schema import load_full_schema
-from ..utils.benchmarking import timer
+from ..utils import to_dnf
+from ..utils import load_full_schema
+from ..utils import timer
 
 
 """
