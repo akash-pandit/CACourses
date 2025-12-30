@@ -8,8 +8,10 @@ becomes
 (101 or 205) or (150 and 151 and 205) or (101 and 230A) or (150 and 151 and 230A)
 """
 
-from typing import Literal, TypedDict, Union
 import itertools
+import orjson
+
+from typing import Literal, TypedDict, Union
 
 
 class ArticulationExpr(TypedDict):
@@ -64,7 +66,7 @@ def _to_dnf(node):
     return []
 
 
-def to_dnf(expr: dict | int) -> dict[str, str | list]:
+def to_dnf(expr: dict | int) -> str:
     """
     Recursively flattens a logic tree of arbitrary depth into a DNF-formatted tree.
 
@@ -72,7 +74,8 @@ def to_dnf(expr: dict | int) -> dict[str, str | list]:
     """
     
     mat = _to_dnf(expr)
-    return {
+    dnf_articulation = {
         "conj": "Or",
         "items": [{"conj": "And", "items": row} for row in mat]
     }
+    return orjson.dumps(dnf_articulation).decode()

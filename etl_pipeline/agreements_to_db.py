@@ -9,7 +9,7 @@ import pickle
 from sqlalchemy import text, create_engine, JSON
 
 from utils.dnf_converter import to_dnf
-from utils.generate_schema import merge_schemas
+from utils.generate_schema import load_full_schema
 
 
 """
@@ -17,7 +17,7 @@ Query a local copy of the 2024-2025 ASSIST.org articulation
 agreements and write them to a local (testing) postgres database.
 """
 
-def extract_articulations(fp: Path, schema: pl.Schema) -> pl.DataFrame:
+def extract_articulations_lazy(fp: Path, schema: pl.Schema) -> pl.LazyFrame:
     uni = int(fp.parts[-2])
     cc  = int(fp.parts[-1].split('to')[0])
 
@@ -104,7 +104,6 @@ def extract_articulations(fp: Path, schema: pl.Schema) -> pl.DataFrame:
                 items=pl.col("articulation")
             )
         )
-        .collect()
     )
 
 
@@ -153,52 +152,39 @@ def main() -> None:
     # logger.debug(f"db url: {db_url}")
 
     # load schema for prefix-based data
-    if schema_prefix_fp.exists():
-        logger.info("Loading precomputed schema for prefix-based articulations")
-        with schema_prefix_fp.open(mode='rb') as fp:
-            schema_prefix: pl.Schema = pickle.load(file=fp)
-    else:
-        logger.info("Precomputed prefix schema not found, inferring from data")
-        schema_list_prefix = [pl.read_json(fp, infer_schema_length=None).schema for fp in DATA_DIR.glob("*/*prefixes.json")]
-        schema_prefix = merge_schemas(schemas=schema_list_prefix)
-        with schema_prefix_fp.open(mode='wb') as fp:
-            pickle.dump(obj=schema_prefix, file=fp)
+    schema_prefix = load_full_schema(
+        schema_fp=schema_prefix_fp,
+        data_dir=DATA_DIR,
+        data_glob="*/*prefixes.json",
+        logger=logger
+    )
 
     # load schema for major-based data
-    if schema_major_fp.exists():
-        logger.info("Loading precomputed schema for major-based articulations")
-        with schema_major_fp.open(mode='rb') as fp:
-            schema_major: pl.Schema = pickle.load(file=fp)
-    else:
-        logger.info("Precomputed major schema not found, inferring from data")
-        schema_list_major  = [pl.read_json(fp, infer_schema_length=None).schema for fp in DATA_DIR.glob("*/*majors.json")]
-        schema_major  = merge_schemas(schema_list_major)
-        with schema_major_fp.open(mode="wb") as fp:
-            pickle.dump(obj=schema_major, file=fp)
-
+    schema_major = load_full_schema(
+        schema_fp=schema_major_fp,
+        data_dir=DATA_DIR,
+        data_glob="*/*majors.json",
+        logger=logger
+    )
 
     # extract articulations
     logger.info("Extracting articulations")
-    prefixes_agg = [
-        extract_articulations(fp=fp, schema=schema_prefix)
-        .with_columns(
-            pl.col("articulation")
-            .map_elements(to_dnf, return_dtype=pl.Struct)
-        )
-        for fp in DATA_DIR.glob("*/*prefixes.json")
-    ]
-    majors_agg = [
-        extract_articulations(fp=fp, schema=schema_major)
-        .with_columns(
-            pl.col("articulation")
-            .map_elements(to_dnf, return_dtype=pl.Struct)
-        )
-        for fp in DATA_DIR.glob("*/*majors.json")
-    ]
-    articulations = pl.concat(prefixes_agg + majors_agg).with_columns(
-        pl.col("articulation")
-        .struct.json_encode()
+        
+    prefixes_lazy = (
+        pl.concat([
+            extract_articulations_lazy(fp=fp, schema=schema_prefix) 
+            for fp in DATA_DIR.glob("*/*prefixes.json")
+        ])
+        .with_columns(pl.col("articulation").map_elements(to_dnf, return_dtype=pl.String))
     )
+    majors_lazy = (
+        pl.concat([
+            extract_articulations_lazy(fp=fp, schema=schema_major ) 
+            for fp in DATA_DIR.glob("*/*majors.json")
+        ])
+        .with_columns(pl.col("articulation").map_elements(to_dnf, return_dtype=pl.String))
+    )
+    articulations = pl.concat((prefixes_lazy, majors_lazy)).collect()
 
     # write articulations to database
     logger.info("Writing articulations to database")

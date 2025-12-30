@@ -5,6 +5,9 @@ agreements. Agreements live in project/data/[university-id].
 
 import polars as pl
 from functools import lru_cache
+import logging
+import pickle
+from pathlib import Path
 
 
 @lru_cache(maxsize=128)
@@ -90,3 +93,19 @@ def merge_schemas(schemas: list[pl.Schema]) -> pl.Schema:
                 current_schema_map[field_name] = _merge_dtypes_optimized(existing_dtype, new_dtype)
     
     return pl.Schema(current_schema_map)
+
+
+def load_full_schema(schema_fp: Path, data_dir: Path, data_glob: str, logger: logging.Logger | None = None) -> pl.Schema:
+    if schema_fp.exists():
+        if logger:
+            logger.info(f"Loading precomputed schema for {schema_fp.name}")
+        with schema_fp.open(mode='rb') as fp:
+            schema: pl.Schema = pickle.load(file=fp)
+    else:
+        if logger:
+            logger.info(f"No precomputed schema found at {schema_fp.name}, inferring from data...")
+        schema_list = [pl.read_json(fp, infer_schema_length=None).schema for fp in data_dir.glob(data_glob)]
+        schema = merge_schemas(schemas=schema_list)
+        with schema_fp.open(mode='wb') as fp:
+            pickle.dump(obj=schema, file=fp)
+    return schema
