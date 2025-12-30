@@ -5,17 +5,21 @@ import logging
 import os
 import polars as pl
 from pathlib import Path
-import pickle
 from sqlalchemy import text, create_engine, JSON
 
 from utils.dnf_converter import to_dnf
 from utils.generate_schema import load_full_schema
+from utils.benchmarking import timer
 
 
 """
 Query a local copy of the 2024-2025 ASSIST.org articulation
 agreements and write them to a local (testing) postgres database.
 """
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("agreements_to_db")
+
 
 def extract_articulations_lazy(fp: Path, schema: pl.Schema) -> pl.LazyFrame:
     uni = int(fp.parts[-2])
@@ -132,67 +136,76 @@ def write_to_db(agreements: pl.DataFrame, db_url: str) -> None:
         )
 
 
+@timer(label="Agreements to DB", logger=logger, level=logging.INFO)
 def main() -> None:
-    logging.basicConfig(level=logging.INFO)
-    logger = logging.getLogger("agreements_to_db")
+    
+    # 1. Load relevant variables
 
-    # file paths
     PROJECTDIR = Path("/home/akash/Main/projects/CACourses")
     DATA_DIR = PROJECTDIR/"data"
     ETL_DIR = PROJECTDIR/"etl_pipeline"
     schema_prefix_fp = ETL_DIR / "schemas/schema_prefix.pickle"
     schema_major_fp = ETL_DIR / "schemas/schema_major.pickle"
     
-    # get environment variables
     load_dotenv(dotenv_path=ETL_DIR/".env")
     psql_user =   os.getenv("LOCALDB_USER")
     psql_pwd =    os.getenv("LOCALDB_PWD")
     psql_dbname = os.getenv("LOCALDB_NAME")
-    db_url = f"postgresql+psycopg2://{psql_user}:{psql_pwd}@localhost:5432/{psql_dbname}"
-    # logger.debug(f"db url: {db_url}")
+    db_url = f"postgresql+psycopg://{psql_user}:{psql_pwd}@localhost:5432/{psql_dbname}"
 
-    # load schema for prefix-based data
-    schema_prefix = load_full_schema(
-        schema_fp=schema_prefix_fp,
-        data_dir=DATA_DIR,
-        data_glob="*/*prefixes.json",
-        logger=logger
-    )
+    # 2. get polars schemas
 
-    # load schema for major-based data
-    schema_major = load_full_schema(
-        schema_fp=schema_major_fp,
-        data_dir=DATA_DIR,
-        data_glob="*/*majors.json",
-        logger=logger
-    )
+    with timer("Load schemas", logger=logger, level=logging.INFO):
+        # load schema for prefix-based data
+        schema_prefix = load_full_schema(
+            schema_fp=schema_prefix_fp,
+            data_dir=DATA_DIR,
+            data_glob="*/*prefixes.json",
+            logger=logger
+        )
 
-    # extract articulations
-    logger.info("Extracting articulations")
-        
-    prefixes_lazy = (
-        pl.concat([
-            extract_articulations_lazy(fp=fp, schema=schema_prefix) 
-            for fp in DATA_DIR.glob("*/*prefixes.json")
-        ])
-        .with_columns(pl.col("articulation").map_elements(to_dnf, return_dtype=pl.String))
-    )
-    majors_lazy = (
-        pl.concat([
-            extract_articulations_lazy(fp=fp, schema=schema_major ) 
-            for fp in DATA_DIR.glob("*/*majors.json")
-        ])
-        .with_columns(pl.col("articulation").map_elements(to_dnf, return_dtype=pl.String))
-    )
-    articulations = pl.concat((prefixes_lazy, majors_lazy)).collect()
+        # load schema for major-based data
+        schema_major = load_full_schema(
+            schema_fp=schema_major_fp,
+            data_dir=DATA_DIR,
+            data_glob="*/*majors.json",
+            logger=logger
+        )
 
-    # write articulations to database
-    logger.info("Writing articulations to database")
-    write_to_db(
-        agreements=articulations,
-        db_url=db_url
-    )
-    logger.info("Transaction complete")
+    # 3. Extract Articulations as LazyFrames
+
+    with timer(label="LF Extraction", logger=logger, level=logging.INFO):
+        prefixes_lazy = (
+            pl.concat((
+                extract_articulations_lazy(fp=fp, schema=schema_prefix) 
+                for fp in DATA_DIR.glob("*/*prefixes.json")
+            ))
+            .with_columns(pl.col("articulation").map_elements(to_dnf, return_dtype=pl.String))
+        )
+
+        majors_lazy = (
+            pl.concat((
+                extract_articulations_lazy(fp=fp, schema=schema_major ) 
+                for fp in DATA_DIR.glob("*/*majors.json")
+            ))
+            .with_columns(pl.col("articulation").map_elements(to_dnf, return_dtype=pl.String))
+        )
+
+    # 4. Collect Articulations
+    
+    with timer(label="LF Collection", logger=logger, level=logging.INFO):
+        articulations = pl.concat((prefixes_lazy, majors_lazy)).unique().collect()
+        logger.info(f" articulations DF estimated size: {articulations.estimated_size("mb"):.2f} megabytes, {len(articulations)} rows")
+
+        del prefixes_lazy, majors_lazy
+
+    # 5. Write articulations to database
+    
+    with timer(label="Write to PgSQL", logger=logger, level=logging.INFO):
+        write_to_db(
+            agreements=articulations,
+            db_url=db_url
+        )
     return
 
     
