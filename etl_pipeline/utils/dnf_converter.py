@@ -6,13 +6,6 @@ e.g.
 ((101 or (150 and 151)) and (205 or 230A))
 becomes
 (101 or 205) or (150 and 151 and 205) or (101 and 230A) or (150 and 151 and 230A)
-represented as a 2d array
-[
-  [101, 205],
-  [150, 151, 205],
-  [101, 230A],
-  [150, 151, 230A]
-]
 """
 
 from typing import Literal, TypedDict, Union
@@ -25,10 +18,6 @@ class ArticulationExpr(TypedDict):
 
 
 def _to_dnf(node):
-    """
-    Recursively flattens a logic tree of arbitrary depth into a 2D matrix.
-    Returns: List[List[int]] (Disjunctive Normal Form)
-    """
     # base: no conjunctions
     if not isinstance(node, dict):
         return [[node]] if node is not None else []
@@ -75,10 +64,11 @@ def _to_dnf(node):
     return []
 
 
-def to_dnf(expr: dict | int):
+def to_dnf(expr: dict | int) -> dict[str, str | list]:
     """
-    Recursively flattens a logic tree of arbitrary depth into a 2D matrix.
-    Returns: List[List[int]] (Disjunctive Normal Form)
+    Recursively flattens a logic tree of arbitrary depth into a DNF-formatted tree.
+
+    Formatted as: "{'conj': 'Or', 'items': [{'conj': 'And', 'items': [1, ...]}, ...]}".
     """
     
     mat = _to_dnf(expr)
