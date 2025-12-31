@@ -40,12 +40,12 @@ def create_glossary(fp: Path, schema: pl.Schema) -> pl.DataFrame:
         .select(
                 course_id=pl.col("cc_courses").struct.field("courseIdentifierParentId"),
                 course_code=pl.col("cc_courses").struct.field("prefix") + " " + pl.col("cc_courses").struct.field("courseNumber"),
-                course_title=pl.col("cc_courses").struct.field("courseTitle"),
+                course_name=pl.col("cc_courses").struct.field("courseTitle"),
                 min_units=pl.col("cc_courses").struct.field("minUnits"),
                 max_units=pl.col("cc_courses").struct.field("maxUnits"),
                 begin=pl.col("cc_courses").struct.field("begin"),
                 end=pl.col("cc_courses").struct.field("end"),
-                inst=pl.lit(cc)
+                inst_id=pl.lit(cc)
         )
     )
 
@@ -59,12 +59,12 @@ def create_glossary(fp: Path, schema: pl.Schema) -> pl.DataFrame:
         .select(
                 course_id=_coalesce_courses("courseIdentifierParentId"),
                 course_code=_concat_coalesce_courses("prefix", "courseNumber"),
-                course_title=_coalesce_courses("courseTitle"),
+                course_name=_coalesce_courses("courseTitle"),
                 min_units=_coalesce_courses("minUnits"),
                 max_units=_coalesce_courses("maxUnits"),
                 begin=_coalesce_courses("begin"),
                 end=_coalesce_courses("end"),
-                inst=pl.lit(uni)
+                inst_id=pl.lit(uni)
         )
     )
 

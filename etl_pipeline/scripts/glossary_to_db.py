@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-from dotenv import load_dotenv
 import logging
 import os
 from pathlib import Path
@@ -10,7 +9,8 @@ import polars as pl
 from utils import (
     create_glossary,
     load_full_schema,
-    timer
+    timer,
+    write_glossary_to_psql
 )
 
 """
@@ -34,13 +34,12 @@ def main():
     schema_major_fp = ETL_DIR / "schemas/schema_major.pickle"
     
     # get environment variables
-    load_dotenv(dotenv_path=ETL_DIR/".env")
     psql_user =   os.getenv("POSTGRES_USER")
     psql_pwd =    os.getenv("POSTGRES_PWD")
     psql_host =   os.getenv("POSTGRES_HOSTNAME")
     psql_port =   os.getenv("POSTGRES_PORT")
     psql_dbname = os.getenv("POSTGRES_DBNAME")
-    psql_url = f"postgresql+psycopg://{psql_user}:{psql_pwd}@{psql_host}:{psql_port}/{psql_dbname}"
+    psql_url = f"postgresql://{psql_user}:{psql_pwd}@{psql_host}:{psql_port}/{psql_dbname}"
     
     # 2. get polars schemas
 
@@ -86,8 +85,17 @@ def main():
             .drop("begin", "end", "eterm")
             .unique(subset=["course_id"], keep="first")
         )
-        del prefixes_agg, majors_agg
         logger.info(f" glossary DF estimated size: {courses.estimated_size("mb"):.2f} megabytes, {len(courses)} rows")
+        
+        del prefixes_agg, majors_agg
+
+    # 4. Write glossary to db
+
+    with timer(label="Write to PgSQL", logger=logger, level=logging.INFO):
+        write_glossary_to_psql(
+            glossary=courses,
+            db_url=psql_url
+        )
 
 
 if __name__ == "__main__":

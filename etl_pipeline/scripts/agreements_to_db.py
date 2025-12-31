@@ -5,13 +5,13 @@ import logging
 import os
 import polars as pl
 from pathlib import Path
-from sqlalchemy import text, create_engine, JSON
 
 from utils import (
     extract_articulations_lazy,
     load_full_schema,
     to_dnf,
-    timer
+    timer,
+    write_articulations_to_psql
 )
 
 """
@@ -21,31 +21,6 @@ agreements and write them to a local (testing) postgres database.
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("agreements_to_db")
-
-
-def write_to_db(agreements: pl.DataFrame, db_url: str) -> None:
-    
-    engine = create_engine(db_url)
-
-    with engine.begin() as conn:
-        conn.execute(text("DROP TABLE IF EXISTS articulations;"))
-        conn.execute(text("""
-            CREATE TABLE articulations(
-                course_id INT4 NOT NULL,
-                cc INT2 NOT NULL,
-                uni INT2 NOT NULL,
-                articulation JSONB NOT NULL,
-                PRIMARY KEY (course_id, cc, uni)
-            );
-        """))
-
-        agreements.write_database(
-            table_name="articulations",
-            connection=conn,
-            if_table_exists="append",
-            engine="sqlalchemy",
-            engine_options={"dtype": {"articulation": JSON}}
-        )
 
 
 @timer(label="Agreements to DB", logger=logger, level=logging.INFO)
@@ -65,7 +40,7 @@ def main() -> None:
     psql_host =   os.getenv("POSTGRES_HOSTNAME")
     psql_port =   os.getenv("POSTGRES_PORT")
     psql_dbname = os.getenv("POSTGRES_DBNAME")
-    psql_url = f"postgresql+psycopg://{psql_user}:{psql_pwd}@{psql_host}:{psql_port}/{psql_dbname}"
+    psql_url = f"postgresql://{psql_user}:{psql_pwd}@{psql_host}:{psql_port}/{psql_dbname}"
 
     # 2. get polars schemas
 
@@ -116,7 +91,7 @@ def main() -> None:
     # 5. Write articulations to database
     
     with timer(label="Write to PgSQL", logger=logger, level=logging.INFO):
-        write_to_db(
+        write_articulations_to_psql(
             agreements=articulations,
             db_url=psql_url
         )
