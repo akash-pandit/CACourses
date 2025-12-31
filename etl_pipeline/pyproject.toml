@@ -4,9 +4,10 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
+
+# Production dependencies
 dependencies = [
     "dotenv>=0.9.9",
-    "ipykernel>=7.1.0",
     "orjson>=3.11.5",
     "pandas>=2.3.3",
     "pip>=25.3",
@@ -14,5 +15,12 @@ dependencies = [
     "psycopg[binary]>=3.3.2",
     "pyarrow>=22.0.0",
     "sqlalchemy>=2.0.45",
+]
+
+# Dev/notebook dependencies
+[dependency-groups]
+dev = [
+    "adbc-driver-postgresql>=1.9.0",
+    "ipykernel>=7.1.0",
     "tqdm>=4.67.1",
 ]

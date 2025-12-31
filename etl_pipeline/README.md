@@ -30,11 +30,11 @@ Use `uv run` to execute scripts to ensure environment variables and dependencies
 #### NOTE: `etl_pipeline/` assumes a sister directory `data/`, containing articulation data at `data/{uni}/{cc}to{uni}-{majors,prefixes}.json`. To populate this, please run `download_data.py` in the project root.
 
 ```bash
-uv run scripts/agreements_to_db.py
-uv run scripts/glossary_to_db.py 
+uv run --env-file=.env scripts/agreements_to_db.py
+uv run --env-file=.env scripts/glossary_to_db.py 
 ```
 Each script logs execution metrics (elapsed time, dataframe size) via Python's logging library, you can capture these by redirecting `stderr` to a file or nullify them via `/dev/null`. e.g.
 ```bash
-uv run scripts/agreements_to_db.py 2> agreements_to_db.log  # saves logging output to agreements_to_db.log
-uv run scripts/glossary_to_db.py 2> /dev/null               # runs script quietly
+uv run --env-file=.env scripts/agreements_to_db.py 2> agreements_to_db.log  # saves logging output to agreements_to_db.log
+uv run --env-file=.env scripts/glossary_to_db.py 2> /dev/null               # runs script quietly
 ```
