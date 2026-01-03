@@ -40,8 +40,33 @@ def get_articulations(course_id: int):
         )
         
         # Transform data into the desired dictionary format
-        data_map = {elem.get("cc"): elem.get("articulation") for elem in query.data if isinstance(elem, dict)}
-        return create_response(200, data_map)
+        articulation_map: dict[int, str] = {
+            elem.get("cc"): elem.get("articulation") 
+            for elem in query.data 
+            if isinstance(elem, dict)
+        } # type: ignore
+
+        course_id_set = set()
+        for articulation_str in articulation_map.values():
+            articulation = json.loads(articulation_str)
+            for and_group in articulation.get("items"):
+                course_id_set.update(and_group.get("items"))
+        
+        query = (
+            SUPA_CLIENT
+            .table("glossary")
+            .select("*")
+            .in_("course_id", course_id_set)
+            .execute()
+        )
+        
+        glossary_map: dict[int, str] = {
+            elem.get("course_id"): elem
+            for elem in query.data
+            if isinstance(elem, dict)
+        } # type: ignore
+
+        return create_response(200, [articulation_map, glossary_map])
         
     except APIError as e:
         print(f"Database error: {e}") # Log for CloudWatch
@@ -49,7 +74,7 @@ def get_articulations(course_id: int):
     except Exception as e:
         print(f"Unexpected error: {e}")
         return create_response(500, {"error": "Internal server error"})
-
+    
 
 def lambda_handler(event, context):
     params = event.get('queryStringParameters') or {}
