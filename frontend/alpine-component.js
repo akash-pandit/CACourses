@@ -4,8 +4,6 @@ const artiCache = {};
 
 document.addEventListener('alpine:init', () => {
     // Shared caches localized to this script
-    
-
     Alpine.data('alpineMain', () => ({
         // --- State ---
         activeIndex: -1,
@@ -116,7 +114,7 @@ document.addEventListener('alpine:init', () => {
             }
             this.loadingArticulations = true;
             try {
-                const API = 'https://z26wqyts4e52be3njzagavub3e0xxusm.lambda-url.us-west-1.on.aws';
+                const API = 'https://5eqjf6ysqgsoyr2ln34dfigeim0naiez.lambda-url.us-west-1.on.aws';
                 const result = await fetch(`${API}/?course_id=${encodeURIComponent(this.courseID)}`);
                 this.articulations = await result.json();
                 artiCache[this.courseID] = this.articulations;
