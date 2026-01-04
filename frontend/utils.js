@@ -1,12 +1,13 @@
+const GET_ARTICULATIONS_LAMBDA_URL = 'https://5eqjf6ysqgsoyr2ln34dfigeim0naiez.lambda-url.us-west-1.on.aws';
+const GET_COURSES_LAMBDA_URL = 'https://kedlmmemb2qvdqlzu5srtnqoi40icpqk.lambda-url.us-west-1.on.aws';
+
 /**
  * Retrieves articulation agreements and maps IDs to course details.
  * @param {string} courseID - ID from the search input.
  * @returns {Promise<Array<Array<{string, string}>>>} {cc: [[{code, name}, ...], ...], ...}
  */
 async function _fetchArticulations(courseID) {
-    const API = 'https://5eqjf6ysqgsoyr2ln34dfigeim0naiez.lambda-url.us-west-1.on.aws';
-    
-    const response = await fetch(`${API}/?course_id=${encodeURIComponent(courseID)}`);
+    const response = await fetch(`${GET_ARTICULATIONS_LAMBDA_URL}/?course_id=${encodeURIComponent(courseID)}`);
 
     if (!response.ok) throw new Error("Failed to fetch articulation data");
 
@@ -35,37 +36,11 @@ async function _fetchArticulations(courseID) {
     return result;
 }
 
-
-async function getCoursesArray(univID, cache) {
-    // console.log(`getCoursesArray(${courseID}, courseCache)`)
-    if (univID in cache) { return cache[univID]; }
-
-    try {
-        const API_COURSES = 'https://lzlnwhushmmp5jnpzqed6x4qa40dfsjr.lambda-url.us-west-1.on.aws'; 
-        // console.log(`sending request to ${API_COURSES}/?uni=${encodeURIComponent(univID)}`);
-        const result = await fetch(`${API_COURSES}/?uni=${encodeURIComponent(univID)}`);
-        const courses = await result.json();
-        const sortedCourses = courses.sort((a, b) => a.course_code.localeCompare(b.course_code));
-            
-        cache[univID] = sortedCourses;
-        return sortedCourses;
-
-    } catch (error) { console.error("Error fetching courses:", error); return []; }
+async function fetchCCMap() {
+    resp = await fetch("institutions_cc.json")
+    if (!resp.ok) throw new Error("Couldn't load institutions_cc.json")
+    return await resp.json()
 }
 
-
-async function getArticulationsArray(courseID, cache) {
-    // console.log(`getArticulationsArray(${courseID}, artiCache)`)
-    if (courseID in cache) { return cache[courseID]; }
-
-    try {
-        const API_ARTS    = 'https://z26wqyts4e52be3njzagavub3e0xxusm.lambda-url.us-west-1.on.aws';
-        // console.log(`sending request to ${API_ARTS}/?course_id=${encodeURIComponent(courseID)}`);
-        const result = await fetch(`${API_ARTS}/?course_id=${encodeURIComponent(courseID)}`);
-        const [agreements, courses] = await result.json();
-        
-        cache[courseID] = [agreements, courses];
-        return [agreements, courses];
-
-    } catch (error) { console.error("Error fetching articulations:", error); return []; }
-}
+window.ccMap = {}; 
+fetchCCMap().then(data => window.ccMap = data);

@@ -26,7 +26,13 @@
 </head>
 <!------------------------------------------------------------------>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center p-4">
-    <h1 class="mt-10 text-6xl font-extrabold text-gray-800 text-center mb-6">CA Courses</h1>
+    <h1 class="mt-10 text-6xl font-extrabold text-gray-800 text-center mb-3">CA Courses</h1>
+    <h3 class="text-gray-600 text-center mb-3">
+        <a href="javascript:void(0)" onclick="alert('Coming soon to a CACourses near you!')" class="mx-4">About This Project</a> 
+        <a href="https://github.com/akash-pandit/CACourses" target="_blank" class="mx-4">Project Source Code</a>
+        <a href="https://linkedin.com/in/akash-pandit-" class="mx-4">LinkedIn</a>
+        <a href="mailto://mrakashpandit@gmail.com" class="mx-4">Reach Out</a>
+    </h3>
 
     <!-- Main alpine reactive block -->
     <div x-data="alpineMain">
@@ -112,22 +118,13 @@
         </div>
         
         <!-- articulation block -->
-        <!-- <div class="bg-white rounded-xl p-8 max-w-5xl w-4/5 mx-auto space-y-8 mb-10">
-            <template x-for="[cc, matrix] in Object.entries(articulations)">
-                <li
-                
-                ></li>
-            </template>
-        </div> -->
-
-        <div class="space-y-8 p-4 bg-gray-50 rounded-lg">
+        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-6xl mx-auto space-y-8 mb-10">
             <template x-for="[cc, matrix] in Object.entries(articulations)" :key="cc">
-                <div class="bg-white shadow-sm border border-gray-200 rounded-xl overflow-hidden">
-                    
+                <!-- Community College Block -->
+                <div class="bg-white shadow-lg border border-gray-200 rounded-2xl overflow-hidden">
+                    <!-- CC Name -->
                     <div class="bg-gray-800 px-4 py-2">
-                        <h2 class="text-white font-mono text-sm uppercase tracking-wider">
-                            Articulation ID: <span x-text="cc"></span>
-                        </h2>
+                        <h2 x-text="getCCName(cc)" class="text-white text-sm tracking-wider"></h2>
                     </div>
 
                     <div class="p-4 space-y-4">
@@ -171,15 +168,11 @@
             </template>
         </div>
 
-        <div class="text-center text-sm text-gray-500 mt-4 space-y-2">
+        <!-- <div class="text-center text-sm text-gray-500 mt-4 space-y-2">
             <div x-text="`univSearching: ${univSearching} univ: ${univ} univID: ${univID} showUniOpts: ${showUniOpts}`"></div>
             <div x-text="`courseSearching: ${courseSearching} course: ${course} courseID: ${courseID}`"></div>
-            <div x-text="`articulations: ${articulations}`"
-        </div>
-    </div>
-
-
-    </div>
+            <div x-text="`articulations: ${articulations}`"></div>
+        </div> -->
 
 </body>
 </html>

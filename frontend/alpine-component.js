@@ -3,7 +3,6 @@ const courseCache = {};
 const artiCache = {};
 
 document.addEventListener('alpine:init', () => {
-    // Shared caches localized to this script
     Alpine.data('alpineMain', () => ({
         // --- State ---
         activeIndex: -1,
@@ -27,7 +26,7 @@ document.addEventListener('alpine:init', () => {
 
         // --- Initialization ---
         init() {
-            fetch('../data/institutions_state.json')
+            fetch('institutions_state.json')
                 .then(response => response.json())
                 .then(data => {
                     this.unis = Object.entries(data)
@@ -38,7 +37,7 @@ document.addEventListener('alpine:init', () => {
                 .catch(err => console.error('Error fetching institutions:', err));
         },
 
-        // --- Getters (Computed Logic) ---
+        // --- Getters (Computed Logic) --
         get searchUnis() {
             const term = this.univSearching.toLowerCase();
             return this.unis.filter(([name]) => {
@@ -78,6 +77,7 @@ document.addEventListener('alpine:init', () => {
             if (this.blurTimeout) clearTimeout(this.blurTimeout);
         },
 
+        // TODO: refactor to use a _fetchCourses
         async fetchCourses() {
             if (this.univID in courseCache) {
                 this.courses = courseCache[this.univID];
@@ -170,6 +170,10 @@ document.addEventListener('alpine:init', () => {
                 .replace("California Polytechnic University,", "Cal Poly")
                 .replace("State University", "State")
                 .replace("San Luis Obispo", "SLO");
+        },
+
+        getCCName(cc_id) {
+            return window.ccMap?.[cc_id] || `ID: ${cc_id}`
         }
     }));
 });
