@@ -27,7 +27,7 @@ document.addEventListener('alpine:init', () => {
 
         // --- Initialization ---
         init() {
-            fetch('data/institutions_state.json')
+            fetch('../data/institutions_state.json')
                 .then(response => response.json())
                 .then(data => {
                     this.unis = Object.entries(data)
@@ -114,9 +114,7 @@ document.addEventListener('alpine:init', () => {
             }
             this.loadingArticulations = true;
             try {
-                const API = 'https://5eqjf6ysqgsoyr2ln34dfigeim0naiez.lambda-url.us-west-1.on.aws';
-                const result = await fetch(`${API}/?course_id=${encodeURIComponent(this.courseID)}`);
-                this.articulations = await result.json();
+                this.articulations = await _fetchArticulations(this.courseID);
                 artiCache[this.courseID] = this.articulations;
             } catch (error) {
                 console.error("Error fetching articulations:", error);
