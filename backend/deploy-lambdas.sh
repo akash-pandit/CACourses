@@ -168,6 +168,7 @@ for dir in $dirs; do
 
             log "Created lambda function $funcname with url $URL"
         fi
+        rm "$zipfp"
     fi
 done
 log "All lambdas updated :)"
