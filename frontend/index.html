@@ -28,7 +28,7 @@
 <body class="bg-gray-100 min-h-screen flex flex-col items-center p-4">
     <h1 class="mt-10 text-6xl font-extrabold text-gray-800 text-center mb-3">CA Courses</h1>
     <h3 class="text-gray-600 text-center mb-3">
-        <a href="javascript:void(0)" onclick="alert('Coming soon to a CACourses near you!')" class="mx-4">About CACourses</a> 
+        <a href="javascript:void(0)" onclick="alert('Coming soon, stay tuned!')" class="mx-4">About CACourses</a> 
         <a href="https://github.com/akash-pandit/CACourses" target="_blank" class="mx-4">Source Code</a>
         <a href="https://linkedin.com/in/akash-pandit-" class="mx-4">LinkedIn</a>
     </h3>
@@ -177,15 +177,23 @@
                 </template>
             </template>
             <template x-if="Object.entries(articulations).length === 0">
-                <p>No Substitutes Available For This Course</p>
+                <p class="text-center text-lg text-gray-600 font-semibold">No Substitutes Available For This Course</p>
             </template>
         </div>
         
+        <!-- Debug -->
         <!-- <div class="text-center text-sm text-gray-500 mt-4 space-y-2">
             <div x-text="`univSearching: ${univSearching} univ: ${univ} univID: ${univID} showUniOpts: ${showUniOpts}`"></div>
             <div x-text="`courseSearching: ${courseSearching} course: ${course} courseID: ${courseID}`"></div>
             <div x-text="`articulations: ${articulations}`"></div>
         </div> -->
+        <footer class="text-center text-sm text-gray-500 mt-4 space-y-2">
+            <div>Created and Maintained by Akash Pandit</div>
+            <div>Powered by AWS Lambda, Vercel, Supabase, and the Polars library</div>
+            <div class="">
+                Not affiliated with ASSIST.org, the University of California, the California State University, or California Community Colleges.
+            </div>
+        </footer>
 
 </body>
 </html>
