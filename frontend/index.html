@@ -28,8 +28,8 @@
 <body class="bg-gray-100 min-h-screen flex flex-col items-center p-4">
     <h1 class="mt-10 text-6xl font-extrabold text-gray-800 text-center mb-3">CA Courses</h1>
     <h3 class="text-gray-600 text-center mb-3">
-        <a href="javascript:void(0)" onclick="alert('Coming soon to a CACourses near you!')" class="mx-4">About This Project</a> 
-        <a href="https://github.com/akash-pandit/CACourses" target="_blank" class="mx-4">Project Source Code</a>
+        <a href="javascript:void(0)" onclick="alert('Coming soon to a CACourses near you!')" class="mx-4">About CACourses</a> 
+        <a href="https://github.com/akash-pandit/CACourses" target="_blank" class="mx-4">Source Code</a>
         <a href="https://linkedin.com/in/akash-pandit-" class="mx-4">LinkedIn</a>
     </h3>
 
@@ -116,57 +116,59 @@
             </div>
         </div>
         
+        <!-- <div x-text="`showArticulationBlock: ${showArticulationBlock}`" class="text-center text-sm text-gray-500 mt-4 space-y-2"></div>  -->
         <!-- articulation block -->
-        <div class="bg-white rounded-xl shadow-2xl p-8 max-w-6xl mx-auto space-y-8 mb-10">
-            <template x-for="[cc, matrix] in Object.entries(articulations)" :key="cc">
-                <!-- Community College Block -->
-                <div class="bg-white shadow-lg border border-gray-200 rounded-2xl overflow-hidden">
-                    <!-- CC Name -->
-                    <div class="bg-gray-800 px-4 py-2">
-                        <h2 x-text="getCCName(cc)" class="text-white text-sm tracking-wider"></h2>
-                    </div>
+        <div x-show="showArticulationBlock" class="bg-white rounded-xl shadow-2xl px-8 py-1 max-w-6xl mx-auto space-y-8 mb-10">
+            <template x-if="Object.entries(articulations).length > 0">
+                <template x-for="[cc, matrix] in Object.entries(articulations)" :key="cc">
+                    <!-- Community College Block -->
+                    <div class="bg-white shadow-lg border border-gray-200 rounded-2xl overflow-hidden">
+                        <!-- CC Name -->
+                        <div class="bg-gray-800 px-4 py-2">
+                            <h2 x-text="getCCName(cc)" class="text-white text-sm tracking-wider"></h2>
+                        </div>
 
-                    <div class="p-4 space-y-4">
-                        <template x-for="(andBlock, index) in matrix" :key="index">
-                            <div>
-                                <template x-if="index > 0">
-                                    <div class="flex items-center my-4">
-                                        <div class="flex-grow border-t border-gray-200"></div>
-                                        <span class="mx-4 text-xs font-bold text-gray-400 uppercase">OR</span>
-                                        <div class="flex-grow border-t border-gray-200"></div>
-                                    </div>
-                                </template>
-
-                                <div class="grid grid-cols-1 gap-2">
-                                    <template x-for="(course, cIndex) in andBlock" :key="cIndex">
-                                        <div class="flex items-center p-3 bg-blue-50 border border-blue-100 rounded-md">
-                                            <template x-if="cIndex > 0">
-                                                <div class="flex items-center my-4">
-                                                    <div class="flex-grow border-t border-gray-200"></div>
-                                                    <span class="mx-4 text-xs font-bold text-gray-400 uppercase">AND</span>
-                                                    <div class="flex-grow border-t border-gray-200"></div>
-                                                </div>
-                                            </template>
-                                            <div class="flex-shrink-0 w-24">
-                                                <span class="text-blue-700 font-bold text-sm" x-text="course.code"></span>
-                                            </div>
-                                            <div class="ml-4 border-l border-blue-200 pl-4">
-                                                <span class="text-gray-700 text-sm" x-text="course.name"></span>
-                                            </div>
+                        <div class="p-4 space-y-4">
+                            <template x-for="(andBlock, index) in matrix" :key="index">
+                                <div>
+                                    <template x-if="index > 0">
+                                        <div class="flex items-center my-4">
+                                            <div class="flex-grow border-t border-gray-200"></div>
+                                            <span class="mx-4 text-xs font-bold text-gray-400 uppercase">OR</span>
+                                            <div class="flex-grow border-t border-gray-200"></div>
                                         </div>
                                     </template>
-                                </div>
-                            </div>
-                        </template>
 
-                        <template x-if="matrix.length === 0">
-                            <p class="text-gray-500 text-italic text-sm py-4">No specific course requirements found for this group.</p>
-                        </template>
+                                    <div class="grid grid-cols-1 gap-2">
+                                        <template x-for="(course, cIndex) in andBlock" :key="cIndex">
+                                            <div class="flex items-center p-3 bg-blue-50 border border-blue-100 rounded-md">
+                                                <template x-if="cIndex > 0">
+                                                    <div class="flex items-center my-4">
+                                                        <div class="flex-grow border-t border-gray-200"></div>
+                                                        <span class="mx-4 text-xs font-bold text-gray-400 uppercase">AND</span>
+                                                        <div class="flex-grow border-t border-gray-200"></div>
+                                                    </div>
+                                                </template>
+                                                <div class="flex-shrink-0 w-24">
+                                                    <span class="text-blue-700 font-bold text-sm" x-text="course.code"></span>
+                                                </div>
+                                                <div class="ml-4 border-l border-blue-200 pl-4">
+                                                    <span class="text-gray-700 text-sm" x-text="course.name"></span>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
                     </div>
-                </div>
+                </template>
+            </template>
+            <template x-if="Object.entries(articulations).length === 0">
+                <p>No Substitutes Available For This Course</p>
             </template>
         </div>
-
+        
         <!-- <div class="text-center text-sm text-gray-500 mt-4 space-y-2">
             <div x-text="`univSearching: ${univSearching} univ: ${univ} univID: ${univID} showUniOpts: ${showUniOpts}`"></div>
             <div x-text="`courseSearching: ${courseSearching} course: ${course} courseID: ${courseID}`"></div>

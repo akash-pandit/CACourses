@@ -23,6 +23,7 @@ document.addEventListener('alpine:init', () => {
 
         loadingArticulations: false,
         articulations: [],
+        showArticulationBlock: false,
 
         // --- Initialization ---
         init() {
@@ -105,6 +106,7 @@ document.addEventListener('alpine:init', () => {
                 this.courseID = id;
                 await this.fetchArticulations();
             }
+            this.showArticulationBlock = true;
         },
 
         async fetchArticulations() {
