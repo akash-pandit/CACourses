@@ -2,6 +2,8 @@
 
 **A tool for CA students to find the perfect course replacement.**
 
+![A brief demo of CACourses](cacourses-demo.gif)
+
 - [CACourses](#cacourses)
   - [Description](#description)
   - [Motivations](#motivations)
