@@ -17,6 +17,7 @@
     - [The Backend](#the-backend)
     - [The Frontend](#the-frontend)
   - [Future Plans](#future-plans)
+  - [Known bugs](#known-bugs)
 
 ## Description
 
@@ -95,11 +96,16 @@ The backend is deployed via a script `deploy-lambdas.sh`, which will:
 A simple frontend was designed with AI-assisted styling via TailwindCSS classes, and hosted via Vercel. Basic reactivity and interactivity were created with Alpine.js. It looks clean enough (one would hope), but it may be clear that frontend is not exactly my forte. Regardless, in project-land, one must wear many hats.
 
 ## Future Plans
-
-- Tweak UI for a more cohesive look
 - Build a comprehensive test suite (at least for backend + pipeline)
 - Automatic monthly scraping of data and re-creation of DB
 - Notice when query gives no articulations
 - Automatically run a basic query on supabase to not get no-activity'd and paused every couple of weeks 🥲
 - Filtering of articulations via community college
 - Dockerize pipeline
+
+## Known bugs
+- Duplicate courses (course code, institution) may get past unique filters in database creation by virtue of different course IDs
+  - hotfix: deleted duplicate row from production database
+  - symptom: university with duplicates does not render course selection dropdown
+  - cause: duplicate code as key in x-for element causes error & failure to execute/render
+  - proposed solution: add filtering step in `glossary_to_db.py` to unique filter database by (inst,  course code), select latest added via 'begin' field before dropping
