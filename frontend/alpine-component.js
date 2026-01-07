@@ -66,6 +66,7 @@ document.addEventListener('alpine:init', () => {
         // --- Methods ---
         async selectUni(name, id) {
             this.showUniOpts = false;
+            this.showArticulationBlock = false;
             if (id != this.univID) {
                 this.univSearching = '';
                 this.univ = name;
