@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Metadata -->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- external resources -->
+    <link rel="icon" href="../assets/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Site edit -->
+    <title>About CA Courses</title>
+    <style>
+        [x-cloak] { display: none !important }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-4">
+    <!-- Header -->
+    <h1 class="mt-10 text-6xl font-extrabold text-gray-800 text-center mb-3">CA Courses</h1>
+    <!-- Navbar -->
+    <h3 class="text-gray-600 text-center mb-3">
+        <a href="/" class="mx-4">Home</a> 
+        <a href="/changelog" class="mx-4">Changelog</a>
+        <a href="https://github.com/akash-pandit/CACourses" target="_blank" class="mx-4">Source Code</a>
+        <a href="https://linkedin.com/in/akash-pandit-" class="mx-4">LinkedIn</a>
+    </h3>
+
+    <!-- Main content block -->
+    <div class="bg-white rounded-2xl shadow-xl p-8 max-w-5xl mx-auto space-y-10 mb-10 border border-gray-150">
+        <div class="text-center space-y-2">
+            <h2 class="text-3xl text-gray-800 font-bold">About CA Courses</h2>
+            <p class="text-gray-500 max-w-2xl mx-auto">
+                A student-built utility for community college to university course transfers, powered by <a href="https://assist.org" target="_blank" class="text-blue-600 hover:underline font-medium">ASSIST.org</a> data.
+            </p>
+        </div>
+
+        <hr class="border-gray-100">
+
+        <div class="grid md:grid-cols-2 gap-8 items-start">
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold text-gray-700 flex items-center">
+                    <span class="bg-amber-100 text-amber-600 p-1 rounded-md mr-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                    </span>
+                    The Problem
+                </h3>
+                <p class="text-gray-600 leading-relaxed">
+                    On ASSIST, finding a specific course equivalency requires checking every single community college one-by-one. What should be a simple question becomes tedious work, extending the search from minutes to hours.
+                </p>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="text-lg font-semibold text-gray-700 flex items-center">
+                    <span class="bg-green-100 text-green-600 p-1 rounded-md mr-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </span>
+                    The Solution
+                </h3>
+                <p class="text-gray-600 leading-relaxed">
+                    CA Courses condenses potentially hours of searching into a <strong>single query</strong>. With a single query, you can find every valid community college substitute course for any transferrable university course.
+                </p>
+            </div>
+        </div>
+
+        <div class="bg-gray-50 rounded-xl p-6 grid md:grid-cols-2 gap-8 border border-gray-100">
+            <div>
+                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Project Purpose</h3>
+                <ul class="space-y-3 text-gray-600">
+                    <li class="flex items-start">
+                        <span class="text-blue-500 mr-2">•</span>
+                        To save student time by providing a simple, centralized utility for course equivalency.
+                    </li>
+                    <li class="flex items-start">
+                        <span class="text-blue-500 mr-2">•</span>
+                        To serve as a 'personal playground' for experimenting with modern software development technologies and practices.
+                    </li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Technical Stack</h3>
+                <p class="text-gray-600 text-sm leading-relaxed">
+                    Data is managed in <strong>Supabase</strong> (PostgreSQL) and served via <strong>AWS Lambda</strong> functions. The front-end is hosted on <strong>Vercel</strong>, ensuring high performance and reliability for students across California.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center text-sm text-gray-500 my-4 space-y-2">
+        <div>Created and Maintained by Akash Pandit</div>
+        <div>Powered by AWS Lambda, Vercel, Supabase, and the Polars library</div>
+        <div class="">
+            Not affiliated with ASSIST.org, the University of California, the California State University, or California Community Colleges.
+        </div>
+    </footer>
+</body>
+</html>

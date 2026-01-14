@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- Metadata -->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- external resources -->
+    <link rel="icon" href="../assets/favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Site edit -->
+    <title>About CA Courses</title>
+    <style>
+        [x-cloak] { display: none !important }
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center p-4">
+    <!-- Header -->
+    <h1 class="mt-10 text-6xl font-extrabold text-gray-800 text-center mb-3">CA Courses</h1>
+    <!-- Navbar -->
+    <h3 class="text-gray-600 text-center mb-3">
+        <a href="/" class="mx-4">Home</a> 
+        <a href="/about" class="mx-4">About</a>
+        <a href="https://github.com/akash-pandit/CACourses" target="_blank" class="mx-4">Source Code</a>
+        <a href="https://linkedin.com/in/akash-pandit-" class="mx-4">LinkedIn</a>
+    </h3>
+
+    <div class="bg-white rounded-2xl shadow-xl p-8 w-full md:min-w-[400px] md:max-w-5xl mx-auto space-y-10 mb-10 border border-gray-150">
+        
+        <h3 class="text-lg font-bold text-gray-600 text-center">
+            See what has changed in the development of this website. For a more fine-grained technical breakdown of changes, see the project's GitHub commit history.
+        </h3>
+
+        <hr class="border-t border-gray-200 my-8">
+
+        <!-- Full Release -->
+        <div class="space-y-4">
+            <div class="flex items-baseline gap-3">
+                <h3 class="text-xl font-bold text-gray-800">New Pages</h3>
+                <span class="text-sm font-medium text-gray-400">Jan 14, 2026</span>
+            </div>
+            
+            <ul class="list-disc ml-5 space-y-2 text-gray-600">
+                <li>Created 'About' and 'Changelog' pages</li>
+                <li>Minor content and project structure updates</li>
+            </ul>
+        </div>
+
+        <!-- Full Release -->
+        <div class="space-y-4">
+            <div class="flex items-baseline gap-3">
+                <h3 class="text-xl font-bold text-gray-800">Full Release</h3>
+                <span class="text-sm font-medium text-gray-400">Jan 8, 2026</span>
+            </div>
+            
+            <ul class="list-disc ml-5 space-y-2 text-gray-600">
+                <li>Re-launched tool with a fresh interface and robust internals</li>
+                <li>Refactored course extraction pipeline to identify ~10,000 previously uncaptured courses</li>
+
+            </ul>
+        </div>
+
+        <!-- Initial MVP release -->
+        <div class="space-y-4">
+            <div class="flex items-baseline gap-3">
+                <h3 class="text-xl font-bold text-gray-800">Initial Minimal Release</h3>
+                <span class="text-sm font-medium text-gray-400">May 2025</span>
+            </div>
+            
+            <ul class="list-disc ml-5 space-y-2 text-gray-600">
+                <li>Launched a minimally viable version of this website with core functionality</li>
+            </ul>
+        </div>
+    </div>
+
+    <footer class="text-center text-sm text-gray-500 my-4 space-y-2">
+        <div>Created and Maintained by Akash Pandit</div>
+        <div>Powered by AWS Lambda, Vercel, Supabase, and the Polars library</div>
+        <div class="">
+            Not affiliated with ASSIST.org, the University of California, the California State University, or California Community Colleges.
+        </div>
+    </footer>
+</body>
+</html>
