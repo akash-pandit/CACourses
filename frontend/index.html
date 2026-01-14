@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-theme="light">
+<html>
 <head>
     <!-- Metadata -->
     <meta charset="UTF-8">
@@ -7,18 +7,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <!-- external resources -->
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="assets/favicon.ico" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-    <script src="utils.js"></script>
-    <script src="alpine-component.js"></script>
+    <script src="scripts/utils-api.js"></script>
+    <script src="scripts/utils-misc.js"></script>
+    <script src="scripts/alpine-component.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"></script>
 
     <!-- site edit -->
-    <title>Course Articulations</title>
+    <title>CA Courses</title>
     <style>
         [x-cloak] { display: none !important }
         body { font-family: 'Inter', sans-serif; }
@@ -27,8 +28,10 @@
 <!------------------------------------------------------------------>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center p-4">
     <h1 class="mt-10 text-6xl font-extrabold text-gray-800 text-center mb-3">CA Courses</h1>
+    <!-- Navbar -->
     <h3 class="text-gray-600 text-center mb-3">
-        <a href="javascript:void(0)" onclick="alert('Coming soon, stay tuned!')" class="mx-4">About CACourses</a> 
+        <a href="/about" class="mx-4">About</a> 
+        <a href="/changelog" class="mx-4">Changelog</a>
         <a href="https://github.com/akash-pandit/CACourses" target="_blank" class="mx-4">Source Code</a>
         <a href="https://linkedin.com/in/akash-pandit-" class="mx-4">LinkedIn</a>
     </h3>
@@ -187,13 +190,13 @@
             <div x-text="`courseSearching: ${courseSearching} course: ${course} courseID: ${courseID}`"></div>
             <div x-text="`articulations: ${articulations}`"></div>
         </div> -->
-        <footer class="text-center text-sm text-gray-500 mt-4 space-y-2">
+
+        <footer class="text-center text-sm text-gray-500 my-4 space-y-2">
             <div>Created and Maintained by Akash Pandit</div>
             <div>Powered by AWS Lambda, Vercel, Supabase, and the Polars library</div>
             <div class="">
                 Not affiliated with ASSIST.org, the University of California, the California State University, or California Community Colleges.
             </div>
         </footer>
-
 </body>
 </html>
