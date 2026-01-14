@@ -45,7 +45,7 @@ async function _fetchArticulations(courseID) {
  * @returns {Promise<Array<Object<string, string>>>}
  */
 async function _fetchCourses(univID) {
-    const response = await fetch(`${GET_COURSES_LAMBDA_URL}/?uni=${encodeURIComponent(this.univID)}`);
+    const response = await fetch(`${GET_COURSES_LAMBDA_URL}/?inst_id=${encodeURIComponent(univID)}`);
 
     if (!response.ok) throw new Error("Failed to fetch course data");
 
