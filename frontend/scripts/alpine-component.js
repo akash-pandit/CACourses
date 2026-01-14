@@ -26,16 +26,12 @@ document.addEventListener('alpine:init', () => {
         showArticulationBlock: false,
 
         // --- Initialization ---
-        init() {
-            fetch('institutions_state.json')
-                .then(response => response.json())
-                .then(data => {
-                    this.unis = Object.entries(data)
-                        .map(([k, v]) => [v, k])
-                        .sort(([n1], [n2]) => n1.localeCompare(n2));
-                    this.loadingUnis = false;
-                })
-                .catch(err => console.error('Error fetching institutions:', err));
+        async init() {
+            const unis_raw = await fetchUniMap();
+            this.unis = Object.entries(unis_raw)
+                .map(([id, name]) => [name, id])
+                .sort(([n1], [n2]) => n1.localeCompare(n2));
+            this.loadingUnis = false;
         },
 
         // --- Getters (Computed Logic) --
@@ -79,7 +75,6 @@ document.addEventListener('alpine:init', () => {
             if (this.blurTimeout) clearTimeout(this.blurTimeout);
         },
 
-        // TODO: refactor to use a _fetchCourses
         async fetchCourses() {
             if (this.univID in courseCache) {
                 this.courses = courseCache[this.univID];
@@ -87,10 +82,7 @@ document.addEventListener('alpine:init', () => {
             }
             this.loadingCourses = true;
             try {
-                const API = 'https://lzlnwhushmmp5jnpzqed6x4qa40dfsjr.lambda-url.us-west-1.on.aws';
-                const result = await fetch(`${API}/?uni=${encodeURIComponent(this.univID)}`);
-                const data = await result.json();
-                this.courses = data.sort((a, b) => a.course_code.localeCompare(b.course_code));
+                this.courses = await _fetchCourses(this.univID);
                 courseCache[this.univID] = this.courses;
             } catch (error) {
                 console.error("Error fetching courses:", error);
@@ -165,18 +157,6 @@ document.addEventListener('alpine:init', () => {
             }, 200);
         },
 
-        shortenUniName(name) {
-            if (!name) return '';
-            return name
-                .replace("University of California,", "UC")
-                .replace("California State University,", "Cal State")
-                .replace("California Polytechnic University,", "Cal Poly")
-                .replace("State University", "State")
-                .replace("San Luis Obispo", "SLO");
-        },
 
-        getCCName(cc_id) {
-            return window.ccMap?.[cc_id] || `ID: ${cc_id}`
-        }
     }));
 });
