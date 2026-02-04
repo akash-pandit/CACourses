@@ -1,7 +1,7 @@
 [project]
 name = "etl-pipeline"
 version = "0.1.0"
-description = "Add your description here"
+description = "Pipeline that transforms raw JSON data from ASSIST.org's APIs to a PSQL database"
 readme = "README.md"
 requires-python = ">=3.12"
 
