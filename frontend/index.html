@@ -183,7 +183,11 @@
                 </template>
             </template>
             <template x-if="Object.entries(articulations).length === 0">
-                <p class="text-center text-lg text-gray-600 font-semibold">No Substitutes Available For This Course</p>
+                <div class="text-center text-sm text-gray-500">
+                    <p class="text-lg text-gray-600 font-semibold mb-4">No Substitutes Available For This Course :(</p>
+                    <p>Note: some classes (e.g. WRIT 2 at UCSC) have specific agreements that are not shared with <a href="https://assist.org" class="underline hover:no-underline hover:text-gray-700">ASSIST</a>.</p>
+                    <p>To verify, check with the university's registrar and/or course department.</p>
+                </div>
             </template>
         </div>
         
