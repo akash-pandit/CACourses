@@ -52,7 +52,7 @@ def extract_articulations_lazy(fp: Path, schema: pl.Schema) -> pl.LazyFrame:
             )
         )
         .unique()
-        .with_columns(  # coalesce series + indiv course ids itno single column
+        .with_columns(  # coalesce series + indiv course ids into single column
             source_ids=pl.coalesce(
                 pl.col("series_ids"), 
                 pl.concat_list(pl.col("root_id")) 
