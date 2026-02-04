@@ -62,9 +62,6 @@ def create_glossary(fp: Path, schema: pl.Schema) -> pl.DataFrame:
             end=pl.col("cc_courses").struct.field("end"),
             inst_id=pl.lit(cc),
         )
-        .sort(by="end", descending=False, nulls_last=True)
-        .unique(subset=["course_id"], keep="last")
-        .unique(subset=["course_code", "inst_id"], keep="last")
     )
 
     uni_courses = (
@@ -85,9 +82,6 @@ def create_glossary(fp: Path, schema: pl.Schema) -> pl.DataFrame:
             end=_coalesce_courses("end"),
             inst_id=pl.lit(uni),
         )
-        .sort(by="end", descending=False, nulls_last=True)
-        .unique(subset=["course_id"], keep="last")
-        .unique(subset=["course_code", "inst_id"], keep="last")
     )
 
     return pl.concat([cc_courses, uni_courses]).drop_nulls().collect()

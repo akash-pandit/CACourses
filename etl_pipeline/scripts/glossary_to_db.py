@@ -70,6 +70,7 @@ def main():
             .sort("eterm", descending=True)
             .drop("begin", "end", "eterm")
             .unique(subset=["course_id"], keep="first")
+            .unique(subset=["course_code", "inst_id"], keep="first")
         )
         logger.info(
             f" glossary DF estimated size: {courses.estimated_size('mb'):.2f} megabytes, {len(courses)} rows"
