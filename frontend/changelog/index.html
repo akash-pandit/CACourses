@@ -23,24 +23,41 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center p-4">
     <!-- Header -->
-    <h1 class="mt-10 text-6xl font-extrabold text-gray-800 text-center mb-3">CA Courses</h1>
+    <a class="mt-10 text-6xl font-extrabold text-gray-800 text-center mb-3" href="/">CA Courses</a>
     <!-- Navbar -->
     <h3 class="text-gray-600 text-center mb-3">
-        <a href="/" class="mx-4">Home</a> 
-        <a href="/about" class="mx-4">About</a>
+        <a href="/about" class="mx-4">About</a> 
+        <a href="/changelog" class="mx-4 text-gray-800">Changelog</a>
         <a href="https://github.com/akash-pandit/CACourses" target="_blank" class="mx-4">Source Code</a>
         <a href="https://linkedin.com/in/akash-pandit-" class="mx-4">LinkedIn</a>
     </h3>
 
     <div class="bg-white rounded-2xl shadow-xl p-8 w-full md:min-w-[400px] md:max-w-5xl mx-auto space-y-10 mb-10 border border-gray-150">
-        
-        <h3 class="text-lg font-bold text-gray-600 text-center">
-            See what has changed in the development of this website. For a more fine-grained technical breakdown of changes, see the project's GitHub commit history.
+        <!-- Header -->
+        <h3 class="font-bold text-center ">
+            <div class="text-xl text-gray-700">See what has changed in the development of this website.</div>
+            <div class="text-gray-500">
+                For a more fine-grained technical breakdown of changes, see the project's GitHub commit history.
+            </div>
         </h3>
-
         <hr class="border-t border-gray-200 my-8">
 
-                <div class="space-y-4">
+        <!-- Patch -->
+        <div class="space-y-4">
+            <div class="flex items-baseline gap-3">
+                <h3 class="text-xl font-bold text-gray-800">Bug Fixes / QOL</h3>
+                <span class="text-sm font-medium text-gray-400">Feb 4, 2026</span>
+            </div>
+            
+            <ul class="list-disc ml-5 space-y-2 text-gray-600">
+                <li>Patched bug where duplicate course glossary entries per institution prevented dropdown loading</li>
+                <li>Add <i>Loading...</i> block while waiting for articulations</li>
+                <li>Minor formatting changes</li>
+            </ul>
+        </div>
+
+        <!-- New Pages -->
+        <div class="space-y-4">
             <div class="flex items-baseline gap-3">
                 <h3 class="text-xl font-bold text-gray-800">New Pages</h3>
                 <span class="text-sm font-medium text-gray-400">Jan 14, 2026</span>
@@ -49,18 +66,6 @@
             <ul class="list-disc ml-5 space-y-2 text-gray-600">
                 <li>Created 'About' and 'Changelog' pages</li>
                 <li>Minor content and project structure updates</li>
-            </ul>
-        </div>
-
-        <!-- Patch -->
-        <div class="space-y-4">
-            <div class="flex items-baseline gap-3">
-                <h3 class="text-xl font-bold text-gray-800">Bug Fixes</h3>
-                <span class="text-sm font-medium text-gray-400">Feb 4, 2026</span>
-            </div>
-            
-            <ul class="list-disc ml-5 space-y-2 text-gray-600">
-                <li>Patched bug where duplicate course glossary entries per institution prevented dropdown loading</li>
             </ul>
         </div>
 
